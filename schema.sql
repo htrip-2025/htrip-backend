@@ -7,6 +7,9 @@
   - duplicate memberroles table dropped (use `roles` for all)
 */
 
+CREATE DATABASE IF NOT EXISTS `htrip`;
+USE `htrip`;
+
 -- 권한(roles) 정의
 CREATE TABLE roles (
   role_no INT NOT NULL AUTO_INCREMENT,
