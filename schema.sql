@@ -37,7 +37,7 @@ CREATE TABLE users (
   profile_img_url TEXT,
   regist_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_login_at DATETIME,
-  role ENUM('admin','member') NOT NULL DEFAULT 'member' COMMENT '사이트 역할',
+  role ENUM('admin','user') NOT NULL DEFAULT 'user' COMMENT '사이트 역할',
   PRIMARY KEY (user_id)
 ) ENGINE=InnoDB;
 
