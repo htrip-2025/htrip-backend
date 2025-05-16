@@ -154,7 +154,7 @@ CREATE TABLE favorite (
 ) ENGINE=InnoDB;
 
 -- 여행 계획
-CREATE TABLE travel_plan (
+CREATE TABLE trip_plan (
   plan_id INT NOT NULL AUTO_INCREMENT,
   user_id INT NOT NULL,
   title VARCHAR(30) NULL,
@@ -192,7 +192,7 @@ CREATE TABLE user_member_connect (
 ) ENGINE=InnoDB;
 
 -- 여행 일자
-CREATE TABLE trip_days (
+CREATE TABLE plan_days (
   day_id INT NOT NULL AUTO_INCREMENT,
   plan_id INT NOT NULL,
   day_date DATE NULL,
@@ -203,7 +203,7 @@ CREATE TABLE trip_days (
 ) ENGINE=InnoDB;
 
 -- 여행 세부 일정
-CREATE TABLE trip_items (
+CREATE TABLE plan_items (
   item_id INT NOT NULL AUTO_INCREMENT,
   day_id INT NOT NULL,
   place_id INT NOT NULL,
@@ -214,6 +214,6 @@ CREATE TABLE trip_items (
   PRIMARY KEY (item_id),
   INDEX idx_ti_day (day_id),
   INDEX idx_ti_place (place_id),
-  CONSTRAINT fk_ti_day FOREIGN KEY (day_id) REFERENCES trip_days (day_id),
+  CONSTRAINT fk_ti_day FOREIGN KEY (day_id) REFERENCES plan_days (day_id),
   CONSTRAINT fk_ti_place FOREIGN KEY (place_id) REFERENCES attraction (place_id)
 ) ENGINE=InnoDB;
