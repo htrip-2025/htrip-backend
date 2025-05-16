@@ -59,8 +59,6 @@ dependencies {
 	implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:2.1.0'
 
 	// Commons
-	implementation 'org.slf4j:slf4j-api'
-	implementation 'org.slf4j:slf4j-simple'
 	implementation 'commons-fileupload:commons-fileupload:1.5'
 	implementation 'commons-io:commons-io:2.15.1'
 
@@ -68,6 +66,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'com.h2database:h2'
 
 }
 

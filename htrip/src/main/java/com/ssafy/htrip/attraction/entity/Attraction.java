@@ -15,7 +15,7 @@ public class Attraction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "place_id")
-    private Long placeId;
+    private Integer placeId;
 
     @Column(name = "content_id", length = 50)
     private String contentId;
@@ -53,11 +53,11 @@ public class Attraction {
     @Column(name = "category3", length = 10)
     private String category3;
 
-    @Column(name = "latitude", precision = 11, scale = 8, nullable = false)
-    private BigDecimal latitude;
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
 
-    @Column(name = "longitude", precision = 11, scale = 8, nullable = false)
-    private BigDecimal longitude;
+    @Column(name = "longitude",nullable = false)
+    private Double longitude;
 
     @Column(name = "map_level", length = 5)
     private String mapLevel;

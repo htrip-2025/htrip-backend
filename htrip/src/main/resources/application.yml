@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: htrip
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/htrip?serverTimezone=Asia/Seoul&characterEncoding=utf8&useSSL=false
+    username: ${DB_USER:ssafy}       # 환경변수 우선, 없으면 기본값
+    password: ${DB_PASS:ssafy}
+    driver-class-name: com.mysql.cj.jdbc.Driver
