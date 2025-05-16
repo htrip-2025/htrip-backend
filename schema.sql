@@ -22,22 +22,22 @@ CREATE TABLE member_roles (
 ) ENGINE=InnoDB;
 
 INSERT INTO member_roles(role_name, can_edit, can_delete, description) VALUES
-  ('leader', TRUE, TRUE, '계획 작성자 (전체 권한)'),
-  ('editor', TRUE, FALSE, '공동 편집자 (편집만 가능)'),
-  ('viewer', FALSE, FALSE, '읽기 전용 사용자');
+  ('LEADER', TRUE, TRUE, '계획 작성자 (전체 권한)'),
+  ('EDITOR', TRUE, FALSE, '공동 편집자 (편집만 가능)'),
+  ('VIEWER', FALSE, FALSE, '읽기 전용 사용자');
 
 -- 사용자 (site-level role as ENUM)
 CREATE TABLE users (
   user_id INT NOT NULL AUTO_INCREMENT,
   email VARCHAR(255) NOT NULL,
-  oauth_provider ENUM('kakao','naver','google') NOT NULL,
+  oauth_provider ENUM('KAKAO','NAVER','GOOGLE') NOT NULL,
   oauth_id VARCHAR(100) NOT NULL,
   name VARCHAR(100) NOT NULL,
   nickname VARCHAR(100) NOT NULL,
   profile_img_url TEXT,
   regist_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_login_at DATETIME,
-  role ENUM('admin','user') NOT NULL DEFAULT 'user' COMMENT '사이트 역할',
+  role ENUM('USER','ADMIN') NOT NULL DEFAULT 'USER' COMMENT '사이트 역할',
   PRIMARY KEY (user_id)
 ) ENGINE=InnoDB;
 
