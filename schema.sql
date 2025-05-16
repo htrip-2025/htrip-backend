@@ -10,13 +10,6 @@
 CREATE DATABASE IF NOT EXISTS `htrip`;
 USE `htrip`;
 
--- 권한(roles) 정의
-CREATE TABLE roles (
-  role_no INT NOT NULL AUTO_INCREMENT,
-  role_name VARCHAR(50) NOT NULL,
-  PRIMARY KEY (role_no)
-) ENGINE=InnoDB;
-
 -- 회원(사용자)
 CREATE TABLE users (
   user_id INT NOT NULL AUTO_INCREMENT,
@@ -28,10 +21,8 @@ CREATE TABLE users (
   profile_img_url TEXT,
   regist_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_login_at DATETIME,
-  role_no INT NOT NULL,
-  PRIMARY KEY (user_id),
-  INDEX idx_users_role (role_no),
-  CONSTRAINT fk_users_role FOREIGN KEY (role_no) REFERENCES roles (role_no)
+  role VARCHAR(20) NOT NULL,
+  PRIMARY KEY (user_id)
 ) ENGINE=InnoDB;
 
 -- 게시판 카테고리
@@ -176,7 +167,7 @@ CREATE TABLE plan_member (
   PRIMARY KEY (plan_id, role_no),
   INDEX idx_pm_plan (plan_id),
   INDEX idx_pm_role (role_no),
-  CONSTRAINT fk_pm_plan FOREIGN KEY (plan_id) REFERENCES travel_plan (plan_id),
+  CONSTRAINT fk_pm_plan FOREIGN KEY (plan_id) REFERENCES trip_plan (plan_id),
   CONSTRAINT fk_pm_role FOREIGN KEY (role_no) REFERENCES roles (role_no)
 ) ENGINE=InnoDB;
 
@@ -187,23 +178,23 @@ CREATE TABLE user_member_connect (
   PRIMARY KEY (plan_id, user_id),
   INDEX idx_umc_plan (plan_id),
   INDEX idx_umc_user (user_id),
-  CONSTRAINT fk_umc_plan FOREIGN KEY (plan_id) REFERENCES travel_plan (plan_id),
+  CONSTRAINT fk_umc_plan FOREIGN KEY (plan_id) REFERENCES trip_plan (plan_id),
   CONSTRAINT fk_umc_user FOREIGN KEY (user_id) REFERENCES users (user_id)
 ) ENGINE=InnoDB;
 
 -- 여행 일자
-CREATE TABLE plan_days (
+CREATE TABLE trip_days (
   day_id INT NOT NULL AUTO_INCREMENT,
   plan_id INT NOT NULL,
   day_date DATE NULL,
   field VARCHAR(255) NULL,
   PRIMARY KEY (day_id),
   INDEX idx_td_plan (plan_id),
-  CONSTRAINT fk_td_plan FOREIGN KEY (plan_id) REFERENCES travel_plan (plan_id)
+  CONSTRAINT fk_td_plan FOREIGN KEY (plan_id) REFERENCES trip_plan (plan_id)
 ) ENGINE=InnoDB;
 
 -- 여행 세부 일정
-CREATE TABLE plan_items (
+CREATE TABLE trip_items (
   item_id INT NOT NULL AUTO_INCREMENT,
   day_id INT NOT NULL,
   place_id INT NOT NULL,
@@ -214,6 +205,6 @@ CREATE TABLE plan_items (
   PRIMARY KEY (item_id),
   INDEX idx_ti_day (day_id),
   INDEX idx_ti_place (place_id),
-  CONSTRAINT fk_ti_day FOREIGN KEY (day_id) REFERENCES plan_days (day_id),
+  CONSTRAINT fk_ti_day FOREIGN KEY (day_id) REFERENCES trip_days (day_id),
   CONSTRAINT fk_ti_place FOREIGN KEY (place_id) REFERENCES attraction (place_id)
 ) ENGINE=InnoDB;
