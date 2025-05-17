@@ -9,9 +9,9 @@ import java.util.Map;
 
 public class CustomOAuth2User implements OAuth2User {
 
-    private final UserDTO userDTO;
+    private final AuthUserDto userDTO;
 
-    public CustomOAuth2User(UserDTO userDTO) {
+    public CustomOAuth2User(AuthUserDto userDTO) {
 
         this.userDTO = userDTO;
     }
@@ -34,7 +34,7 @@ public class CustomOAuth2User implements OAuth2User {
             @Override
             public String getAuthority() {
 
-                return userDTO.getRole();
+                return String.valueOf(userDTO.getRole());
             }
         });
 

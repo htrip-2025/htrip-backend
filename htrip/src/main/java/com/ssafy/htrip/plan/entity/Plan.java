@@ -1,6 +1,6 @@
 package com.ssafy.htrip.plan.entity;
 
-import com.ssafy.htrip.member.entity.User;
+import com.ssafy.htrip.common.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

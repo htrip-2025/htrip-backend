@@ -1,4 +1,4 @@
-package com.ssafy.htrip.member.entity;
+package com.ssafy.htrip.common.entity;
 
 public enum OauthProvider {
     KAKAO,
