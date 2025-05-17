@@ -38,6 +38,15 @@ public class SecurityConfig {
                 // 나머지 로그인폼은 기본 설정 유지
                 .formLogin(Customizer.withDefaults());
 
+
+        http
+                .logout(logout -> logout
+                        .logoutUrl("/logout")               // 로그아웃 엔드포인트
+                        .logoutSuccessUrl("/")              // 로그아웃 후 리다이렉트
+                        .invalidateHttpSession(true)        // 세션 무효화
+                        .deleteCookies("JSESSIONID")        // 쿠키 삭제
+                );
+
         //csrf disable
         http
                 .csrf((auth) -> auth.disable());

@@ -16,8 +16,6 @@ public class CustomOAuth2User implements OAuth2User {
         this.userDTO = userDTO;
     }
 
-
-
     @Override
     public Map<String, Object> getAttributes() {
 
@@ -46,9 +44,20 @@ public class CustomOAuth2User implements OAuth2User {
 
         return userDTO.getName();
     }
+    // 편의 메서드: DTO 에 담긴 정보 꺼내기
+    public Integer getUserId() {
+        return userDTO.getUserId();
+    }
 
-    public String getUsername() {
+    public String getEmail() {
+        return userDTO.getEmail();
+    }
 
-        return userDTO.getUsername();
+    public String getNickname() {
+        return userDTO.getName();   // 또는 getNickname()
+    }
+
+    public String getProfileImgUrl() {
+        return userDTO.getProfileImgUrl();
     }
 }
