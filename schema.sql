@@ -188,7 +188,7 @@ CREATE TABLE plan_member (
 ) ENGINE=InnoDB;
 
 -- 여행 일자
-CREATE TABLE trip_days (
+CREATE TABLE plan_days (
   day_id INT NOT NULL AUTO_INCREMENT,
   plan_id INT NOT NULL,
   day_date DATE NULL,
@@ -199,7 +199,7 @@ CREATE TABLE trip_days (
 ) ENGINE=InnoDB;
 
 -- 여행 세부 일정
-CREATE TABLE trip_items (
+CREATE TABLE plan_items (
   item_id INT NOT NULL AUTO_INCREMENT,
   day_id INT NOT NULL,
   place_id INT NOT NULL,
