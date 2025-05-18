@@ -55,4 +55,3 @@ spring:
             user-name-attribute: response
   jwt:
     secret: f9JAZBiuU2ejGN2Hda2vEN9Ky43baAtYowAs0QZhpqk=
-    expiration: 3600   # 초 단위 (1시간)
