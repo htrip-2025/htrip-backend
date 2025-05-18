@@ -79,9 +79,7 @@ public class AuthService extends DefaultOAuth2UserService {
     private AuthUserDto convertToAuthUserDto(User user) {
         AuthUserDto userDto = new AuthUserDto();
         userDto.setUserId(user.getUserId());
-        userDto.setEmail(user.getEmail());
         userDto.setName(user.getNickname());
-        userDto.setProfileImgUrl(user.getProfileImgUrl());
         userDto.setRole(user.getRole());
         return userDto;
     }

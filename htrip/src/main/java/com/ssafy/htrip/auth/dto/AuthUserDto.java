@@ -10,8 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 public class AuthUserDto {
     private Integer userId;
-    private String email;
     private String name;
-    private String profileImgUrl;
     private Role role;
 }
