@@ -100,6 +100,10 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml").permitAll()
                         .requestMatchers("/").permitAll()
                         .anyRequest().authenticated());
 
