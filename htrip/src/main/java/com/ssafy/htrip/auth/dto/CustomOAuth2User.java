@@ -49,15 +49,7 @@ public class CustomOAuth2User implements OAuth2User {
         return userDTO.getUserId();
     }
 
-    public String getEmail() {
-        return userDTO.getEmail();
-    }
-
     public String getNickname() {
         return userDTO.getName();   // 또는 getNickname()
-    }
-
-    public String getProfileImgUrl() {
-        return userDTO.getProfileImgUrl();
     }
 }

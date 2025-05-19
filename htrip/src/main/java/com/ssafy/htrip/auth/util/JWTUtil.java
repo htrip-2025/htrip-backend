@@ -1,6 +1,7 @@
 package com.ssafy.htrip.auth.util;
 
 import com.ssafy.htrip.common.entity.Role;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,13 @@ public class JWTUtil {
     }
 
     public Boolean isExpired(String token) {
-
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        try {
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);// 만료나 서명 불일치면 바로 JwtException
+            return false;
+        }
+        catch (ExpiredJwtException e) {
+            return true;   // 만료된 토큰
+        }
     }
 
     public String createJwt(Integer userId, String name, Role role, Long expiredMs) {
