@@ -52,7 +52,7 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000")); //뷰에 맞춰서 변경
+                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5174")); //뷰에 맞춰서 변경
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
