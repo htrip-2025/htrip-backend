@@ -52,8 +52,9 @@ CREATE TABLE board_category (
 CREATE TABLE board (
   board_no BIGINT NOT NULL AUTO_INCREMENT,
   category_no INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
-  user_id INT NOT NULL,
+  user_id INT NULL,
   write_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   views INT NOT NULL DEFAULT 0,
@@ -61,15 +62,17 @@ CREATE TABLE board (
   PRIMARY KEY (board_no),
   INDEX idx_board_category (category_no),
   INDEX idx_board_user (user_id),
+  INDEX idx_board_date (write_date),
+  INDEX idx_board_likes (likes),
   CONSTRAINT fk_board_category FOREIGN KEY (category_no) REFERENCES board_category(category_no),
-  CONSTRAINT fk_board_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+  CONSTRAINT fk_board_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- 댓글
 CREATE TABLE comment (
   comment_id BIGINT NOT NULL AUTO_INCREMENT,
   board_no BIGINT NOT NULL,
-  user_id INT NOT NULL,
+  user_id INT NULL,
   comment TEXT NOT NULL,
   write_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -77,28 +80,21 @@ CREATE TABLE comment (
   INDEX idx_comment_board (board_no),
   INDEX idx_comment_user (user_id),
   CONSTRAINT fk_comment_board FOREIGN KEY (board_no) REFERENCES board(board_no) ON DELETE CASCADE,
-  CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+  CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- 게시글 추천 이력
 CREATE TABLE board_likes (
-  likes_no INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
   board_no BIGINT NOT NULL,
   liked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (likes_no),
-  INDEX idx_bl_board (board_no),
-  CONSTRAINT fk_bl_board FOREIGN KEY (board_no) REFERENCES board(board_no) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- 사용자⇄추천 이력 연결
-CREATE TABLE user_board_likes (
-  user_id INT NOT NULL,
-  likes_no INT NOT NULL,
-  PRIMARY KEY (user_id, likes_no),
-  INDEX idx_ubl_user (user_id),
-  INDEX idx_ubl_likes (likes_no),
-  CONSTRAINT fk_ubl_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_ubl_likes FOREIGN KEY (likes_no) REFERENCES board_likes(likes_no) ON DELETE CASCADE
+  PRIMARY KEY (user_id, board_no),          -- 복합 기본키로 중복 방지
+  CONSTRAINT fk_bl_user 
+    FOREIGN KEY (user_id) REFERENCES users(user_id) 
+    ON DELETE CASCADE,                       -- 사용자 삭제 시 좋아요도 삭제
+  CONSTRAINT fk_bl_board 
+    FOREIGN KEY (board_no) REFERENCES board(board_no) 
+    ON DELETE CASCADE                        -- 게시글 삭제 시 좋아요도 삭제
 ) ENGINE=InnoDB;
 
 -- 지역 코드
