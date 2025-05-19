@@ -25,7 +25,12 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
     @Query("SELECT COUNT(f) FROM Favorite f WHERE f.attraction.placeId = :placeId")
     Long countByPlaceId(@Param("placeId") Integer placeId);
 
+    // 특정 사용자의 찜 개수 (마이페이지용)
+    Long countByUserUserId(Integer userId);
+
     // 태그별 검색
     @Query("SELECT f FROM Favorite f JOIN FETCH f.attraction WHERE f.user.userId = :userId AND f.tag LIKE %:tag%")
     List<Favorite> findByUserIdAndTagContaining(@Param("userId") Integer userId, @Param("tag") String tag);
+
+
 }

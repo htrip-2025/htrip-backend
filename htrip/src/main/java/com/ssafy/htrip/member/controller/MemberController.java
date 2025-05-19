@@ -4,6 +4,10 @@ import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.favorite.dto.FavoriteDto;
 import com.ssafy.htrip.favorite.dto.UpdateFavoriteRequest;
 import com.ssafy.htrip.favorite.service.FavoriteService;
+import com.ssafy.htrip.member.dto.MemberProfileDto;
+import com.ssafy.htrip.member.dto.MemberStatsDto;
+import com.ssafy.htrip.member.dto.UpdateProfileRequest;
+import com.ssafy.htrip.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -20,6 +25,49 @@ import java.util.List;
 public class MemberController {
 
     private final FavoriteService favoriteService;
+    private final MemberService memberService;
+
+    // === 프로필 관리 ===
+
+    // 내 프로필 조회
+    @GetMapping("/")
+    public ResponseEntity<MemberProfileDto> getMyProfile(
+            @AuthenticationPrincipal CustomOAuth2User user) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberProfileDto profile = memberService.getProfile(user.getUserId());
+        return ResponseEntity.ok(profile);
+    }
+
+    // 프로필 수정
+    @PutMapping("/")
+    public ResponseEntity<MemberProfileDto> updateProfile(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestBody UpdateProfileRequest request) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberProfileDto updated = memberService.updateProfile(user.getUserId(), request);
+        return ResponseEntity.ok(updated);
+    }
+
+    // 마이페이지 통계
+    @GetMapping("/stats")
+    public ResponseEntity<MemberStatsDto> getMyStats(
+            @AuthenticationPrincipal CustomOAuth2User user) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberStatsDto stats = memberService.getStats(user.getUserId());
+        return ResponseEntity.ok(stats);
+    }
 
     // 내 찜 목록 조회
     @GetMapping("/favorite")

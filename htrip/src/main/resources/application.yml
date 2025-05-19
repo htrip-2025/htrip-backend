@@ -20,7 +20,7 @@ spring:
         registration:
           kakao:
             client-id: 672d91230fc9972ed8e41cd17461b990
-            redirect-uri: http://localhost:8080/login/auth2/code/kakao
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             scope:
               - profile_nickname
@@ -28,7 +28,7 @@ spring:
           naver:
             client-id: tZxj3_Sq2yxlB0NSP7d3
             client-secret: axyHuILI6e
-            redirect-uri: http://localhost:8080/login/auth2/code/naver
+            redirect-uri: http://localhost:8080/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope:
               - name

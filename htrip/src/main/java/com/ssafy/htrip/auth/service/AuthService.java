@@ -72,6 +72,7 @@ public class AuthService extends DefaultOAuth2UserService {
         user.setNickname(response.getName());
         user.setEmail(response.getEmail());
         user.setRole(Role.USER); // enum 상수 직접 사용
+        user.setRegistDate(LocalDateTime.now());
 
         return userRepository.save(user);
     }
