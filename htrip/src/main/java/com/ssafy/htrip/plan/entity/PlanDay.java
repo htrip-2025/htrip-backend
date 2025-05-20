@@ -29,6 +29,6 @@ public class PlanDay {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<PlanItem> items = new ArrayList<>();
+    private Set<PlanItem> items = new HashSet<>();
 
 }

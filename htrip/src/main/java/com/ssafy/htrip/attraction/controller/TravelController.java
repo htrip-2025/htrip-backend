@@ -26,7 +26,7 @@ public class TravelController {
     private final FavoriteService  favoriteService;
 
     @GetMapping("/{placeId}")
-    public ResponseEntity<AttractionDto> findById(Integer placeId) throws Throwable {
+    public ResponseEntity<AttractionDto> findById(@PathVariable Integer placeId) throws Throwable {
         AttractionDto dto = aService.findById(placeId);
         return ResponseEntity.ok(dto);
     }

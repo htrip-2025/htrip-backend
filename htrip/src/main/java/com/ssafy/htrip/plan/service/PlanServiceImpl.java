@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,6 +76,7 @@ public class PlanServiceImpl implements PlanService {
         plan.setTitle(request.getTitle());
         plan.setStartDate(request.getStartDate());
         plan.setEndDate(request.getEndDate());
+        plan.setUpdateDate(LocalDateTime.now());
         plan.setPublic(request.isPublic());
 
         Plan savedPlan = planRepository.save(plan);

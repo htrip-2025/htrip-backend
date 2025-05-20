@@ -10,7 +10,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "trip_plan")
@@ -32,6 +34,11 @@ public class Plan {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
+    @PrePersist
+    public void setDefaultCreateDate() {
+        this.createDate = LocalDateTime.now();
+    }
+
     @LastModifiedDate
     private LocalDateTime updateDate;
 
@@ -44,7 +51,7 @@ public class Plan {
 
     // Plan → PlanDay (1:N)
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PlanDay> days = new ArrayList<>();
+    private Set<PlanDay> days = new HashSet<>();
 
     // Plan → PlanMember (1:N) - 추가
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
