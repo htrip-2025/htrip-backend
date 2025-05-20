@@ -45,4 +45,8 @@ public class Plan {
     // Plan → PlanDay (1:N)
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlanDay> days = new ArrayList<>();
+
+    // Plan → PlanMember (1:N) - 추가
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlanMember> members = new ArrayList<>();
 }

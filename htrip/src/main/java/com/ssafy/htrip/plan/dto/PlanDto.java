@@ -17,4 +17,10 @@ public class PlanDto {
     private LocalDate endDate;
     private boolean isPublic;
     private List<PlanDayDto> days;
+    private List<PlanMemberDto> members;  // 멤버 정보 추가
+
+    // 현재 사용자의 권한 정보 (프론트엔드에서 UI 제어용)
+    private Boolean canEdit;
+    private Boolean canDelete;
+    private String userRole;
 }

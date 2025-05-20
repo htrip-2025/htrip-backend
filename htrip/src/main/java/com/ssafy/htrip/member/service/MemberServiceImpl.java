@@ -102,7 +102,6 @@ public class MemberServiceImpl implements MemberService {
     public void deleteAccount(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
-
         // 연관된 데이터들은 CASCASE DELETE로 자동 삭제됨
         userRepository.delete(user);
     }

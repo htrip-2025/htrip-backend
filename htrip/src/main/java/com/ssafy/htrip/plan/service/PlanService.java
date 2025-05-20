@@ -1,10 +1,28 @@
 package com.ssafy.htrip.plan.service;
 
-import com.ssafy.htrip.plan.dto.PlanDto;
+import com.ssafy.htrip.plan.dto.*;
 
 import java.util.List;
 
 public interface PlanService {
-    public PlanDto getPlan(Integer planId);
+    PlanDto getPlan(Integer planId);
+    PlanDto getPlanWithPermission(Integer planId, Integer userId);
+
     List<PlanDto> getAllPlans();
+    List<PlanDto> getMyPlans(Integer userId);
+
+    PlanDto createPlan(Integer userId, CreatePlanRequest request);
+    PlanDto updatePlan(Integer planId, Integer userId, CreatePlanRequest request);
+    PlanItemDto addPlanItem(Integer userId, CreatePlanItemRequest request);
+    void deletePlan(Integer planId, Integer userId) throws IllegalAccessException;
+
+    // 멤버 관리 메서드
+    PlanMemberDto inviteMember(Integer planId, Integer inviterId, InviteMemberRequest request);
+    void removeMember(Integer planId, Integer removerId, Integer targetUserId);
+    PlanMemberDto updateMemberRole(Integer planId, Integer updaterId, Integer targetUserId, UpdateMemberRoleRequest request);
+    List<PlanMemberDto> getPlanMembers(Integer planId);
+
+    // 권한 체크 메서드
+    boolean hasEditPermission(Integer planId, Integer userId);
+    boolean hasDeletePermission(Integer planId, Integer userId);
 }
