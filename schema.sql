@@ -208,6 +208,6 @@ CREATE TABLE plan_items (
   PRIMARY KEY (item_id),
   INDEX idx_ti_day (day_id),
   INDEX idx_ti_place (place_id),
-  CONSTRAINT fk_ti_day FOREIGN KEY (day_id) REFERENCES trip_days(day_id) ON DELETE CASCADE,
+  CONSTRAINT fk_ti_day FOREIGN KEY (day_id) REFERENCES plan_days(day_id) ON DELETE CASCADE,
   CONSTRAINT fk_ti_place FOREIGN KEY (place_id) REFERENCES attraction(place_id)
 ) ENGINE=InnoDB;
