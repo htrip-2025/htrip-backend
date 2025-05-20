@@ -189,7 +189,7 @@ CREATE TABLE plan_member (
 CREATE TABLE plan_days (
   day_id INT NOT NULL AUTO_INCREMENT,
   plan_id INT NOT NULL,
-  day_date DATE NULL,
+  day_date INT NULL,
   field VARCHAR(255) NULL,
   PRIMARY KEY (day_id),
   INDEX idx_td_plan (plan_id),
