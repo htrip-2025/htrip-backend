@@ -55,3 +55,6 @@ spring:
             user-name-attribute: response
   jwt:
     secret: f9JAZBiuU2ejGN2Hda2vEN9Ky43baAtYowAs0QZhpqk=
+server:
+  address: 0.0.0.0
+  port: 8080
