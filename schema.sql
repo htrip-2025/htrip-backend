@@ -121,7 +121,7 @@ CREATE TABLE attraction (
   title VARCHAR(255) NOT NULL,
   created_time VARCHAR(14),
   modified_time VARCHAR(14),
-  telephone VARCHAR(50),
+  telephone VARCHAR(255),
   address1 VARCHAR(255),
   address2 VARCHAR(100),
   zip_code VARCHAR(10),
