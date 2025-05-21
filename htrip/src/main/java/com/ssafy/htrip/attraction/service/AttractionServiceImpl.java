@@ -2,15 +2,12 @@
 package com.ssafy.htrip.attraction.service;
 
 import com.ssafy.htrip.attraction.dto.AttractionDto;
-import com.ssafy.htrip.attraction.entity.Area;
 import com.ssafy.htrip.attraction.entity.Attraction;
-import com.ssafy.htrip.attraction.entity.Sigungu;
 import com.ssafy.htrip.attraction.entity.SigunguId;
 import com.ssafy.htrip.attraction.repository.AreaRepository;
 import com.ssafy.htrip.attraction.repository.AttractionRepository;
 import com.ssafy.htrip.attraction.repository.SigunguRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -45,7 +42,6 @@ public class AttractionServiceImpl implements AttractionService {
         return toDto(a);
     }
 
-    @SneakyThrows
     @Override
     public List<AttractionDto> findRandom(int n) {
         List<Attraction> attractions = attractionRepository.findRandom(n);
@@ -56,7 +52,6 @@ public class AttractionServiceImpl implements AttractionService {
                 .collect(Collectors.toList());
     }
 
-    @SneakyThrows
     @Override
     public List<AttractionDto> searchByKeyword(String keyword) {
         List<Attraction> attractions = attractionRepository.findByTitleContainingIgnoreCase(keyword);
@@ -68,7 +63,7 @@ public class AttractionServiceImpl implements AttractionService {
     }
 
     // 연관 엔티티 로드 메서드 수정 (필요에 따라 예외 발생)
-    private void loadRelatedEntities(Attraction attraction) throws NotFoundException {
+    private void loadRelatedEntities(Attraction attraction) {
         try {
             if (attraction.getAreaCode() != null) {
                 areaRepository.findById(attraction.getAreaCode())
