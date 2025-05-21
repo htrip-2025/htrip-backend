@@ -23,7 +23,7 @@ public class Attraction {
     @Column(name = "content_type_id", length = 10)
     private String contentTypeId;
 
-    @Column(name = "title", nullable = false, length = 255)
+    @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "created_time", length = 14)
@@ -32,10 +32,10 @@ public class Attraction {
     @Column(name = "modified_time", length = 14)
     private String modifiedTime;
 
-    @Column(name = "telephone", length = 50)
+    @Column(name = "telephone")
     private String telephone;
 
-    @Column(name = "address1", length = 255)
+    @Column(name = "address1")
     private String address1;
 
     @Column(name = "address2", length = 100)
@@ -62,10 +62,10 @@ public class Attraction {
     @Column(name = "map_level", length = 5)
     private String mapLevel;
 
-    @Column(name = "first_image_url", length = 255)
+    @Column(name = "first_image_url")
     private String firstImageUrl;
 
-    @Column(name = "first_image_thumbnail_url", length = 255)
+    @Column(name = "first_image_thumbnail_url")
     private String firstImageThumbnailUrl;
 
     @Column(name = "copyright_division_code", length = 10)
@@ -74,16 +74,24 @@ public class Attraction {
     @Column(name = "booktour_info", length = 10)
     private String booktourInfo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_code", nullable = false)
-    private Area area;
+    @Column(name = "area_code", nullable = false)
+    private Integer areaCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sigungu_code", nullable = false)
-    private Sigungu sigungu;
+    @Column(name = "sigungu_code", nullable = false)
+    private Integer sigunguCode;
 
     // 기본 생성자
     public Attraction() {}
+    @Transient
+    private Area area;
 
+    @Transient
+    private Sigungu sigungu;
+
+    // 편의 메서드
+    public void setAreaAndSigungu(Area area, Sigungu sigungu) {
+        this.area = area;
+        this.sigungu = sigungu;
+    }
     // 필요한 생성자, Getter/Setter 생략
 }

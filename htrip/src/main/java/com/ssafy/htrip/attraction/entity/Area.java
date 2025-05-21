@@ -11,7 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 public class Area {
     @Id
-    @Column(name = "code")
     private Integer areaCode;
 
     @Column(name = "name", nullable = false, length = 50)
