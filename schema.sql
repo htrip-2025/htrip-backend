@@ -101,46 +101,44 @@ CREATE TABLE board_likes (
 
 -- 지역 코드
 CREATE TABLE area (
-  code INT NOT NULL,
+  area_code INT NOT NULL,
   name VARCHAR(50) NOT NULL,
   PRIMARY KEY (code)
 ) ENGINE=InnoDB;
 
 CREATE TABLE sigungu (
-  code INT NOT NULL,
+  area_code INT NOT NULL,
+  sigungu_code INT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  PRIMARY KEY (code)
+  PRIMARY KEY (area_code, sigungu_code)
 ) ENGINE=InnoDB;
 
 -- 관광지 정보
 CREATE TABLE attraction (
   place_id INT NOT NULL AUTO_INCREMENT,
-  content_id VARCHAR(50) NULL COMMENT '콘텐츠 ID',
-  content_type_id VARCHAR(10) NULL COMMENT '콘텐츠 타입 ID',
+  content_id VARCHAR(50),
+  content_type_id VARCHAR(10),
   title VARCHAR(255) NOT NULL,
-  created_time VARCHAR(14) NULL COMMENT '등록일시(YYYYMMDDHHMMSS)',
-  modified_time VARCHAR(14) NULL COMMENT '수정일시(YYYYMMDDHHMMSS)',
-  telephone VARCHAR(50) NULL,
-  address1 VARCHAR(255) NULL,
-  address2 VARCHAR(100) NULL,
-  zip_code VARCHAR(10) NULL,
-  category1 VARCHAR(10) NULL,
-  category2 VARCHAR(10) NULL,
-  category3 VARCHAR(10) NULL,
+  created_time VARCHAR(14),
+  modified_time VARCHAR(14),
+  telephone VARCHAR(255),
+  address1 VARCHAR(255),
+  address2 VARCHAR(100),
+  zip_code VARCHAR(10),
+  category1 VARCHAR(10),
+  category2 VARCHAR(10),
+  category3 VARCHAR(10),
   latitude DOUBLE NOT NULL,
   longitude DOUBLE NOT NULL,
-  map_level VARCHAR(5) NULL,
-  first_image_url VARCHAR(255) NULL,
-  first_image_thumbnail_url VARCHAR(255) NULL,
-  copyright_division_code VARCHAR(10) NULL,
-  booktour_info VARCHAR(10) NULL,
+  map_level VARCHAR(5),
+  first_image_url VARCHAR(255),
+  first_image_thumbnail_url VARCHAR(255),
+  copyright_division_code VARCHAR(10),
+  booktour_info VARCHAR(10),
   area_code INT NOT NULL,
   sigungu_code INT NOT NULL,
   PRIMARY KEY (place_id),
-  INDEX idx_attr_area (area_code),
-  INDEX idx_attr_sigungu (sigungu_code),
-  CONSTRAINT fk_attr_area FOREIGN KEY (area_code) REFERENCES area(code),
-  CONSTRAINT fk_attr_sigungu FOREIGN KEY (sigungu_code) REFERENCES sigungu(code)
+  INDEX idx_area_sigungu (area_code, sigungu_code)
 ) ENGINE=InnoDB;
 
 -- 즐겨찾기
