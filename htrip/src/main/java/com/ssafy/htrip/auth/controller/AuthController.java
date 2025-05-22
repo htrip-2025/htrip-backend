@@ -2,6 +2,7 @@ package com.ssafy.htrip.auth.controller;
 
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,10 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    MemberService memberService;
+    private final MemberService memberService;
 
     @DeleteMapping("/signout")
     public ResponseEntity<Map<String, String>> deleteAccount(

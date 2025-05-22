@@ -7,12 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Arrays;
 import java.util.List;
 
 public interface AttractionRepository extends JpaRepository<Attraction, Integer> {
     // 특정 areaCode 기준 N개
-    @Query("SELECT a FROM Attraction a WHERE a.area.areaCode = :code ORDER BY a.placeId DESC")
+    @Query("SELECT a FROM Attraction a WHERE a.areaCode = :code ORDER BY a.placeId DESC")
     List<Attraction> findTopNByAreaAreaCode(@Param("code") Integer areaCode, Pageable pageable);
 
     // 랜덤 N개 (MySQL RAND())
