@@ -3,6 +3,7 @@ package com.ssafy.htrip.plan.controller;
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.plan.dto.*;
 import com.ssafy.htrip.plan.service.PlanService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/plan")
 @RequiredArgsConstructor
+@Tag(name = "Plan", description = "여행 계획 관리 API")
 public class PlanController {
 
     private final PlanService planService;

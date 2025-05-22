@@ -6,6 +6,7 @@ import com.ssafy.htrip.attraction.service.AttractionService;
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.favorite.dto.CreateFavoriteRequest;
 import com.ssafy.htrip.favorite.service.FavoriteService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/travel")
 @RequiredArgsConstructor
+@Tag(name = "Travel", description = "여행지/관광지 관리 API")
 public class TravelController {
 
     private final AttractionService attractionService;

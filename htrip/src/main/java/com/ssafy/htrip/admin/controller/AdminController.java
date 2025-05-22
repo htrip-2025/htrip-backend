@@ -9,6 +9,7 @@ import com.ssafy.htrip.admin.service.AdminService;
 import com.ssafy.htrip.common.entity.Role;
 import com.ssafy.htrip.member.dto.MemberProfileDto;
 import com.ssafy.htrip.member.service.MemberService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@Tag(name = "Admin", description = "관리자 전용 시스템 관리 API")
 public class AdminController {
 
     private final AdminService adminService;

@@ -8,6 +8,7 @@ import com.ssafy.htrip.member.dto.MemberProfileDto;
 import com.ssafy.htrip.member.dto.MemberStatsDto;
 import com.ssafy.htrip.member.dto.UpdateProfileRequest;
 import com.ssafy.htrip.member.service.MemberService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
+@Tag(name = "Member", description = "회원 프로필 및 개인정보 관리 API")
 public class MemberController {
 
     private final FavoriteService favoriteService;

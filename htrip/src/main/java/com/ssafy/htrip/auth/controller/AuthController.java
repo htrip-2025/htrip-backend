@@ -2,6 +2,7 @@ package com.ssafy.htrip.auth.controller;
 
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.member.service.MemberService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "회원 인증 관리 API")
 public class AuthController {
 
     private final MemberService memberService;
