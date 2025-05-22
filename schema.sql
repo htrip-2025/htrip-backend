@@ -103,7 +103,7 @@ CREATE TABLE board_likes (
 CREATE TABLE area (
   area_code INT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  PRIMARY KEY (code)
+  PRIMARY KEY (area_code)
 ) ENGINE=InnoDB;
 
 CREATE TABLE sigungu (
