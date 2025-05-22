@@ -1,13 +1,16 @@
 package com.ssafy.htrip.attraction.controller;
 
 import com.ssafy.htrip.attraction.dto.AttractionDto;
-import com.ssafy.htrip.attraction.entity.Attraction;
+import com.ssafy.htrip.attraction.dto.AttractionSearchRequest;
 import com.ssafy.htrip.attraction.service.AttractionService;
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.favorite.dto.CreateFavoriteRequest;
 import com.ssafy.htrip.favorite.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,24 +25,31 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TravelController {
 
-    private final AttractionService aService;
+    private final AttractionService attractionService;
     private final FavoriteService  favoriteService;
 
     @GetMapping("/{placeId}")
     public ResponseEntity<AttractionDto> findById(@PathVariable Integer placeId) throws Throwable {
-        AttractionDto dto = aService.findById(placeId);
+        AttractionDto dto = attractionService.findById(placeId);
         return ResponseEntity.ok(dto);
     }
     @GetMapping("/")
     public ResponseEntity<List<AttractionDto>> previewRandom(@RequestParam(defaultValue = "6") int n) {
-        List<AttractionDto> dto = aService.findRandom(n);
+        List<AttractionDto> dto = attractionService.findRandom(n);
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<AttractionDto>> search(
-            @RequestParam(defaultValue = "") String keyword) {
-        return ResponseEntity.ok(aService.searchByKeyword(keyword));
+    public ResponseEntity<Page<AttractionDto>> searchAttractions(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer areaCode,
+            @RequestParam(required = false) Integer sigunguCode,
+            @PageableDefault(size = 20, sort = "placeId") Pageable pageable) {
+
+        AttractionSearchRequest request = new AttractionSearchRequest(keyword, areaCode, sigunguCode);
+        Page<AttractionDto> result = attractionService.searchAttractions(request, pageable);
+
+        return ResponseEntity.ok(result);
     }
 
     // 여행지 찜하기
@@ -58,7 +68,6 @@ public class TravelController {
             // request가 null인 경우 기본 요청 생성
             if (request == null) {
                 request = new CreateFavoriteRequest();
-                request.setPlaceId(placeId);
             } else {
                 request.setPlaceId(placeId);
             }

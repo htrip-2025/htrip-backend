@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
@@ -30,8 +28,6 @@ public class AttractionDto {
     private String copyrightDivisionCode;
     private String booktourInfo;
 
-    private Integer areaCode;
-    private String   areaName;     // 지역 이름
-    private Integer sigunguCode;
-    private String   sigunguName;  // 시군구 이름
+    private Integer areaCode;  // 지역 이름
+    private Integer sigunguCode;// 시군구 이름
 }

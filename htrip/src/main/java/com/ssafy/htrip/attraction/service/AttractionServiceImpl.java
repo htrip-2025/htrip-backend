@@ -2,6 +2,7 @@
 package com.ssafy.htrip.attraction.service;
 
 import com.ssafy.htrip.attraction.dto.AttractionDto;
+import com.ssafy.htrip.attraction.dto.AttractionSearchRequest;
 import com.ssafy.htrip.attraction.entity.Attraction;
 import com.ssafy.htrip.attraction.entity.SigunguId;
 import com.ssafy.htrip.attraction.repository.AreaRepository;
@@ -10,6 +11,8 @@ import com.ssafy.htrip.attraction.repository.SigunguRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.javassist.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +65,46 @@ public class AttractionServiceImpl implements AttractionService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Page<AttractionDto> searchAttractions(AttractionSearchRequest request, Pageable pageable) {
+        Page<Attraction> attractions;
+
+        String keyword = request.getKeyword();
+        Integer areaCode = request.getAreaCode();
+        Integer sigunguCode = request.getSigunguCode();
+
+        // 조건별 분기 처리
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            if (areaCode != null && sigunguCode != null) {
+                // 키워드 + 지역 + 시군구
+                attractions = attractionRepository.findByTitleContainingIgnoreCaseAndAreaCodeAndSigunguCode(
+                        keyword.trim(), areaCode, sigunguCode, pageable);
+            } else if (areaCode != null) {
+                // 키워드 + 지역
+                attractions = attractionRepository.findByTitleContainingIgnoreCaseAndAreaCode(
+                        keyword.trim(), areaCode, pageable);
+            } else {
+                // 키워드만
+                attractions = attractionRepository.findByTitleContainingIgnoreCase(
+                        keyword.trim(), pageable);
+            }
+        } else {
+            if (areaCode != null && sigunguCode != null) {
+                // 지역 + 시군구
+                attractions = attractionRepository.findByAreaCodeAndSigunguCode(
+                        areaCode, sigunguCode, pageable);
+            } else if (areaCode != null) {
+                // 지역만
+                attractions = attractionRepository.findByAreaCode(areaCode, pageable);
+            } else {
+                // 전체 (페이징만)
+                attractions = attractionRepository.findAll(pageable);
+            }
+        }
+
+        return attractions.map(this::toDto);
+    }
+
     // 연관 엔티티 로드 메서드 수정 (필요에 따라 예외 발생)
     private void loadRelatedEntities(Attraction attraction) {
         try {
@@ -103,9 +146,9 @@ public class AttractionServiceImpl implements AttractionService {
                 .booktourInfo(a.getBooktourInfo())
                 // 연관 엔티티에서 필요한 필드만 꺼내 담기
                 .areaCode(a.getAreaCode())
-                .areaName(a.getArea() != null ? a.getArea().getName() : null)
                 .sigunguCode(a.getSigunguCode())
-                .sigunguName(a.getSigungu() != null ? a.getSigungu().getName() : null)
                 .build();
     }
+
+
 }

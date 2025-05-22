@@ -22,4 +22,19 @@ public interface AttractionRepository extends JpaRepository<Attraction, Integer>
     Page<Attraction> findAll(Pageable pageable);
 
     List<Attraction> findByTitleContainingIgnoreCase(String keyword);
+
+    Page<Attraction> findByAreaCode(Integer areaCode, Pageable pageable);
+
+    // 시군구별 검색
+    Page<Attraction> findByAreaCodeAndSigunguCode(Integer areaCode, Integer sigunguCode, Pageable pageable);
+
+    // 키워드 + 지역 조합 검색
+    Page<Attraction> findByTitleContainingIgnoreCaseAndAreaCode(String keyword, Integer areaCode, Pageable pageable);
+
+    // 키워드 + 시군구 조합 검색
+    Page<Attraction> findByTitleContainingIgnoreCaseAndAreaCodeAndSigunguCode(
+            String keyword, Integer areaCode, Integer sigunguCode, Pageable pageable);
+
+    // 전체 검색 (키워드만)
+    Page<Attraction> findByTitleContainingIgnoreCase(String keyword, Pageable pageable);
 }

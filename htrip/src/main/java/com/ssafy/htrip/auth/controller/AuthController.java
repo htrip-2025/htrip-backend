@@ -24,8 +24,7 @@ public class AuthController {
 
     @DeleteMapping("/signout")
     public ResponseEntity<Map<String, String>> deleteAccount(
-            @AuthenticationPrincipal CustomOAuth2User user,
-            @RequestParam(required = false) String confirmPassword) {
+            @AuthenticationPrincipal CustomOAuth2User user) {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

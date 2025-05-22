@@ -2,6 +2,7 @@ package com.ssafy.htrip.favorite.service;
 
 import com.ssafy.htrip.attraction.dto.AttractionDto;
 import com.ssafy.htrip.attraction.entity.Attraction;
+import com.ssafy.htrip.attraction.repository.AreaRepository;
 import com.ssafy.htrip.attraction.repository.AttractionRepository;
 import com.ssafy.htrip.common.entity.User;
 import com.ssafy.htrip.common.repository.UserRepository;
@@ -27,6 +28,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserRepository userRepository;
     private final AttractionRepository attractionRepository;
+    private final AreaRepository areaRepository;
 
     @Override
     @Transactional
@@ -147,10 +149,8 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .longitude(attraction.getLongitude())
                 .firstImageUrl(attraction.getFirstImageUrl())
                 .firstImageThumbnailUrl(attraction.getFirstImageThumbnailUrl())
-                .areaCode(attraction.getArea().getAreaCode())
-                .areaName(attraction.getArea().getName())
+                .areaCode(attraction.getAreaCode())
                 .sigunguCode(attraction.getSigungu().getSigunguCode())
-                .sigunguName(attraction.getSigungu().getName())
                 .build();
     }
 }

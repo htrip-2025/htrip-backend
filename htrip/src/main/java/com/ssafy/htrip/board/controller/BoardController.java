@@ -1,4 +1,4 @@
-package com.ssafy.htrip.controller;
+package com.ssafy.htrip.board.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
