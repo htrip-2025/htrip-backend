@@ -4,6 +4,7 @@ import com.ssafy.htrip.attraction.dto.AreaDto;
 import com.ssafy.htrip.attraction.dto.SigunguDto;
 import com.ssafy.htrip.attraction.service.AreaService;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/region")
 @RequiredArgsConstructor
+@Tag(name = "Region", description = "지역 확인 API")
 public class RegionController {
 
     private final AreaService areaService;
