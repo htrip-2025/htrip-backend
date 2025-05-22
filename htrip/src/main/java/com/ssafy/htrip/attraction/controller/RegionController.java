@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 @RestController
-@RequestMapping("/area")
+@RequestMapping("/region")
 @RequiredArgsConstructor
-public class AreaController {
+public class RegionController {
 
     private final AreaService areaService;
 
