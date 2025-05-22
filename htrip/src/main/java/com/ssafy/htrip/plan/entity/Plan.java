@@ -34,11 +34,6 @@ public class Plan {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
-    @PrePersist
-    public void setDefaultCreateDate() {
-        this.createDate = LocalDateTime.now();
-    }
-
     @LastModifiedDate
     private LocalDateTime updateDate;
 
