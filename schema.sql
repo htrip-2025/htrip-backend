@@ -141,6 +141,21 @@ CREATE TABLE attraction (
   INDEX idx_area_sigungu (area_code, sigungu_code)
 ) ENGINE=InnoDB;
 
+-- 리뷰 테이블
+CREATE TABLE review (
+  review_id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  place_id INT NOT NULL,
+  content TEXT NOT NULL,
+  create_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (review_id),
+  INDEX idx_review_user (user_id),
+  INDEX idx_review_place (place_id),
+  CONSTRAINT fk_review_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_review_place FOREIGN KEY (place_id) REFERENCES attraction(place_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- 즐겨찾기
 CREATE TABLE favorite (
   favorite_no INT NOT NULL AUTO_INCREMENT,
