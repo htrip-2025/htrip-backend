@@ -7,6 +7,7 @@ import com.ssafy.htrip.member.dto.MemberProfileDto;
 import com.ssafy.htrip.member.dto.MemberStatsDto;
 import com.ssafy.htrip.member.dto.UpdateProfileRequest;
 import com.ssafy.htrip.plan.repository.PlanRepository;
+import com.ssafy.htrip.review.repository.ReviewRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class MemberServiceImpl implements MemberService {
     private final UserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
     private final PlanRepository planRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public MemberProfileDto getProfile(Integer userId) {
@@ -77,8 +79,11 @@ public class MemberServiceImpl implements MemberService {
         // 각종 통계 조회
         Long favoriteCount = favoriteRepository.countByUserUserId(userId);
         Long planCount = planRepository.countByUserUserId(userId);
+        Long reviewCount = reviewRepository.countByUserUserId(userId);
+        // Long boardCount = boardRepository.countByUserUserId(userId);
 
-        // 완료된 여행 계획 수 (endDate가 현재 날짜 이전인 계획들)
+        // 완료된 여행 계획 수
+        Long completedPlanCount = planRepository.countCompletedPlansByUserId(userId);
 
         // 가입 후 일수 계산
         long daysSinceJoin = 0;
@@ -92,6 +97,9 @@ public class MemberServiceImpl implements MemberService {
         return MemberStatsDto.builder()
                 .favoriteCount(favoriteCount)
                 .planCount(planCount)
+                .reviewCount(reviewCount)
+                // .boardCount(boardCount)
+                .completedPlanCount(completedPlanCount)
                 .joinDate(user.getRegistDate())
                 .daysSinceJoin(daysSinceJoin)
                 .build();
