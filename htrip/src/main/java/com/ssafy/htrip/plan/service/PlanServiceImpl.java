@@ -9,6 +9,8 @@ import com.ssafy.htrip.plan.entity.*;
 import com.ssafy.htrip.plan.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,15 @@ public class PlanServiceImpl implements PlanService {
                 .orElseThrow(() -> new EntityNotFoundException("Plan not found: " + planId));
 
         return toPlanDto(plan, userId);
+    }
+
+    @Override
+    public Page<PlanDto> getMyPlansWithPaging(Integer userId, Pageable pageable) {
+        // PlanMember 엔티티를 기반으로 페이징 조회
+        Page<PlanMember> planMemberPage = planMemberRepository.findByUserIdWithPlanPaging(userId, pageable);
+
+        // PlanMember 엔티티를 PlanDto로 변환
+        return planMemberPage.map(pm -> toPlanDto(pm.getPlan(), userId));
     }
 
     @Override

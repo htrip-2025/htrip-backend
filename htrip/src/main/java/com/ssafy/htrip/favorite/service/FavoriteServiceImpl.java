@@ -13,6 +13,8 @@ import com.ssafy.htrip.favorite.entity.Favorite;
 import com.ssafy.htrip.favorite.repository.FavoriteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +89,12 @@ public class FavoriteServiceImpl implements FavoriteService {
         return favorites.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<FavoriteDto> getUserFavoritesWithPaging(Integer userId, Pageable pageable) {
+        Page<Favorite> favoritesPage = favoriteRepository.findByUserUserIdWithPaging(userId, pageable);
+        return favoritesPage.map(this::toDto);
     }
 
     @Override

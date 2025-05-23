@@ -7,6 +7,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -58,14 +62,22 @@ public class PlanController {
 
     // 내가 참여한 계획 목록 조회
     @GetMapping("/my")
-    public ResponseEntity<List<PlanDto>> getMyPlans(
-            @AuthenticationPrincipal CustomOAuth2User user) {
+    public ResponseEntity<Page<PlanDto>> getMyPlans(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "updateDate") String sort,
+            @RequestParam(defaultValue = "desc") String direction) {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<PlanDto> myPlans = planService.getMyPlans(user.getUserId());
+        Sort.Direction sortDirection = "desc".equalsIgnoreCase(direction)
+                ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<PlanDto> myPlans = planService.getMyPlansWithPaging(user.getUserId(), pageable);
         return ResponseEntity.ok(myPlans);
     }
 

@@ -1,6 +1,8 @@
 package com.ssafy.htrip.favorite.repository;
 
 import com.ssafy.htrip.favorite.entity.Favorite;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +15,11 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
     // 특정 사용자의 찜 목록 조회
     @Query("SELECT f FROM Favorite f JOIN FETCH f.attraction WHERE f.user.userId = :userId")
     List<Favorite> findByUserIdWithAttraction(@Param("userId") Integer userId);
+
+    // 특정 사용자의 찜 목록 페이징 조회
+    @Query(value = "SELECT f FROM Favorite f WHERE f.user.userId = :userId ORDER BY f.createAt DESC",
+            countQuery = "SELECT COUNT(f) FROM Favorite f WHERE f.user.userId = :userId")
+    Page<Favorite> findByUserUserIdWithPaging(@Param("userId") Integer userId, Pageable pageable);
 
     // 특정 사용자가 특정 장소를 찜했는지 확인
     @Query("SELECT f FROM Favorite f WHERE f.user.userId = :userId AND f.attraction.placeId = :placeId")

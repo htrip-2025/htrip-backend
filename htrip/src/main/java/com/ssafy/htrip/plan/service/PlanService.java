@@ -1,12 +1,15 @@
 package com.ssafy.htrip.plan.service;
 
 import com.ssafy.htrip.plan.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface PlanService {
     PlanDto getPlan(Integer planId);
     PlanDto getPlanWithPermission(Integer planId, Integer userId);
+    Page<PlanDto> getMyPlansWithPaging(Integer userId, Pageable pageable);
 
     List<PlanDto> getAllPlans();
     List<PlanDto> getMyPlans(Integer userId);

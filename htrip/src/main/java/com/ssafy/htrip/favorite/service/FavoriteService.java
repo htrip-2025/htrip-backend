@@ -3,6 +3,8 @@ package com.ssafy.htrip.favorite.service;
 import com.ssafy.htrip.favorite.dto.FavoriteDto;
 import com.ssafy.htrip.favorite.dto.CreateFavoriteRequest;
 import com.ssafy.htrip.favorite.dto.UpdateFavoriteRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,6 +21,9 @@ public interface FavoriteService {
 
     // 특정 사용자의 찜 목록 조회
     List<FavoriteDto> getUserFavorites(Integer userId);
+
+    // 특정 사용자의 찜 목록 페이징 조회
+    Page<FavoriteDto> getUserFavoritesWithPaging(Integer userId, Pageable pageable);
 
     // 특정 사용자가 특정 장소를 찜했는지 확인
     boolean isFavorite(Integer userId, Integer placeId);
