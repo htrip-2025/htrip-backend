@@ -25,7 +25,7 @@ public class RegionController {
 
     private final AreaService areaService;
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<?> getAllAreas() {
         try {
             List<AreaDto> areas = areaService.getAllAreas();

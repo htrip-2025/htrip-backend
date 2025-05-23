@@ -35,7 +35,7 @@ public class TravelController {
         AttractionDto dto = attractionService.findById(placeId);
         return ResponseEntity.ok(dto);
     }
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<AttractionDto>> previewRandom(@RequestParam(defaultValue = "6") int n) {
         List<AttractionDto> dto = attractionService.findRandom(n);
         return ResponseEntity.ok(dto);

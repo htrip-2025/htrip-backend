@@ -52,7 +52,7 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5174")); //뷰에 맞춰서 변경
+                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173")); //뷰에 맞춰서 변경
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -67,10 +67,10 @@ public class SecurityConfig {
 
         http
                 .logout(logout -> logout
-                        .logoutUrl("/logout")               // 로그아웃 엔드포인트
-                        .logoutSuccessUrl("/")              // 로그아웃 후 리다이렉트
-                        .invalidateHttpSession(true)        // 세션 무효화
-                        .deleteCookies("JSESSIONID")        // 쿠키 삭제
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("http://localhost:5173/")  // 프론트엔드 URL로 변경
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID", "Authorization")  // JWT 쿠키도 삭제
                 );
 
         //csrf disable

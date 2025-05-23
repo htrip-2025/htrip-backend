@@ -31,7 +31,7 @@ public class MemberController {
     // === 프로필 관리 ===
 
     // 내 프로필 조회
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<MemberProfileDto> getMyProfile(
             @AuthenticationPrincipal CustomOAuth2User user) {
 
@@ -44,7 +44,7 @@ public class MemberController {
     }
 
     // 프로필 수정
-    @PutMapping("/")
+    @PutMapping()
     public ResponseEntity<MemberProfileDto> updateProfile(
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody UpdateProfileRequest request) {

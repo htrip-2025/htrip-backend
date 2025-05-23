@@ -50,7 +50,7 @@ public class PlanController {
     }
 
     // 전체 목록 조회 (공개된 계획만)
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<PlanDto>> getAllPlans() {
         List<PlanDto> list = planService.getAllPlans();
         return ResponseEntity.ok(list);
@@ -70,7 +70,7 @@ public class PlanController {
     }
 
     // 일정 생성
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<PlanDto> createPlan(
             @AuthenticationPrincipal CustomOAuth2User user,
             @RequestBody CreatePlanRequest request) {
