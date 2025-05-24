@@ -7,6 +7,7 @@ import com.ssafy.htrip.attraction.entity.Attraction;
 import com.ssafy.htrip.attraction.entity.SigunguId;
 import com.ssafy.htrip.attraction.repository.AreaRepository;
 import com.ssafy.htrip.attraction.repository.AttractionRepository;
+import com.ssafy.htrip.attraction.repository.AttractionContentTypeRepository;
 import com.ssafy.htrip.attraction.repository.SigunguRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class AttractionServiceImpl implements AttractionService {
     private final AttractionRepository attractionRepository;
     private final AreaRepository areaRepository;
     private final SigunguRepository sigunguRepository;
+    private final AttractionCategoryService attractionCategoryService; // 추가: 카테고리 서비스
+    private final AttractionContentTypeRepository attractionContentTypeRepository; // 추가: 컨텐츠 타입 레포지토리
 
     @Override
     public AttractionDto findById(Integer placeId) throws NotFoundException {
@@ -67,42 +70,48 @@ public class AttractionServiceImpl implements AttractionService {
 
     @Override
     public Page<AttractionDto> searchAttractions(AttractionSearchRequest request, Pageable pageable) {
-        Page<Attraction> attractions;
+        // 모든 필터 조건이 null인 경우 전체 조회
+        if (isAllFiltersEmpty(request)) {
+            return attractionRepository.findAll(pageable).map(this::toDto);
+        }
 
-        String keyword = request.getKeyword();
-        Integer areaCode = request.getAreaCode();
-        Integer sigunguCode = request.getSigunguCode();
+        String category1 = null;
+        String category2 = null;
+        String category3 = null;
 
-        // 조건별 분기 처리
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            if (areaCode != null && sigunguCode != null) {
-                // 키워드 + 지역 + 시군구
-                attractions = attractionRepository.findByTitleContainingIgnoreCaseAndAreaCodeAndSigunguCode(
-                        keyword.trim(), areaCode, sigunguCode, pageable);
-            } else if (areaCode != null) {
-                // 키워드 + 지역
-                attractions = attractionRepository.findByTitleContainingIgnoreCaseAndAreaCode(
-                        keyword.trim(), areaCode, pageable);
-            } else {
-                // 키워드만
-                attractions = attractionRepository.findByTitleContainingIgnoreCase(
-                        keyword.trim(), pageable);
-            }
-        } else {
-            if (areaCode != null && sigunguCode != null) {
-                // 지역 + 시군구
-                attractions = attractionRepository.findByAreaCodeAndSigunguCode(
-                        areaCode, sigunguCode, pageable);
-            } else if (areaCode != null) {
-                // 지역만
-                attractions = attractionRepository.findByAreaCode(areaCode, pageable);
-            } else {
-                // 전체 (페이징만)
-                attractions = attractionRepository.findAll(pageable);
+        // 카테고리 코드 길이에 따라 적절한 필드에 설정
+        if (request.getCategoryCode() != null && !request.getCategoryCode().isEmpty()) {
+            int length = request.getCategoryCode().length();
+            if (length == 3) {
+                category1 = request.getCategoryCode();
+            } else if (length == 5) {
+                category2 = request.getCategoryCode();
+            } else if (length == 9) {
+                category3 = request.getCategoryCode();
             }
         }
 
+        // 고급 필터링 쿼리 사용
+        Page<Attraction> attractions = attractionRepository.findWithFilters(
+                request.getKeyword(),
+                request.getAreaCode(),
+                request.getSigunguCode(),
+                request.getContentTypeId(),
+                category1,
+                category2,
+                category3,
+                pageable
+        );
+
         return attractions.map(this::toDto);
+    }
+
+    private boolean isAllFiltersEmpty(AttractionSearchRequest request) {
+        return (request.getKeyword() == null || request.getKeyword().trim().isEmpty()) &&
+                request.getAreaCode() == null &&
+                request.getSigunguCode() == null &&
+                (request.getContentTypeId() == null || request.getContentTypeId().trim().isEmpty()) &&
+                (request.getCategoryCode() == null || request.getCategoryCode().trim().isEmpty());
     }
 
     // 연관 엔티티 로드 메서드 수정 (필요에 따라 예외 발생)
@@ -127,8 +136,9 @@ public class AttractionServiceImpl implements AttractionService {
     }
 
     private AttractionDto toDto(Attraction a) {
-        return AttractionDto.builder()
+        AttractionDto.AttractionDtoBuilder builder = AttractionDto.builder()
                 .placeId(a.getPlaceId())
+                .contentTypeId(a.getContentTypeId())
                 .title(a.getTitle())
                 .telephone(a.getTelephone())
                 .address1(a.getAddress1())
@@ -146,9 +156,23 @@ public class AttractionServiceImpl implements AttractionService {
                 .booktourInfo(a.getBooktourInfo())
                 // 연관 엔티티에서 필요한 필드만 꺼내 담기
                 .areaCode(a.getAreaCode())
-                .sigunguCode(a.getSigunguCode())
-                .build();
+                .sigunguCode(a.getSigunguCode());
+
+        // 컨텐츠 타입 이름 조회 및 추가
+        if (a.getContentTypeId() != null && !a.getContentTypeId().isEmpty()) {
+            try {
+                Integer contentTypeIdInt = Integer.parseInt(a.getContentTypeId());
+                attractionContentTypeRepository.findById(contentTypeIdInt).ifPresent(
+                        contentType -> builder.contentTypeName(contentType.getContentName())
+                );
+            } catch (NumberFormatException e) {
+                log.warn("유효하지 않은 contentTypeId: {}", a.getContentTypeId());
+            }
+        }
+
+        // 카테고리 정보 조회 및 추가
+        builder.categories(attractionCategoryService.getAttractionCategories(a.getCategory3()));
+
+        return builder.build();
     }
-
-
 }
