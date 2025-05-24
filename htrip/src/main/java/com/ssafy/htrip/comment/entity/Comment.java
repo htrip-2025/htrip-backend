@@ -1,7 +1,7 @@
-// src/main/java/com/example/demo/domain/Comment.java
 package com.ssafy.htrip.comment.entity;
 
 import com.ssafy.htrip.board.entity.Board;
+import com.ssafy.htrip.common.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,32 +16,45 @@ public class Comment {
     @Column(name = "comment_id")
     private Long commentId;
 
-    // 어느 게시글의 댓글인지
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_no", nullable = false)
     private Board board;
 
-    // 작성자 사용자 ID
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "write_date", nullable = false, updatable = false)
+    private LocalDateTime writeDate;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "update_date")
+    private LocalDateTime updateDate;
+
+    @Column(nullable = false)
+    private Integer likes = 0;
 
     @PrePersist
     public void prePersist() {
-        createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
+        writeDate = LocalDateTime.now();
+        updateDate = writeDate;
     }
 
     @PreUpdate
     public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+        updateDate = LocalDateTime.now();
+    }
+
+    // 좋아요 증가/감소 메서드
+    public void increaseLikes() {
+        this.likes++;
+    }
+
+    public void decreaseLikes() {
+        if (this.likes > 0) {
+            this.likes--;
+        }
     }
 }
