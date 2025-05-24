@@ -1,0 +1,8 @@
+// src/main/java/com/example/demo/repository/CategoryRepository.java
+package com.ssafy.htrip.board.repository;
+
+import com.ssafy.htrip.board.entity.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
+}
