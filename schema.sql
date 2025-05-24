@@ -113,6 +113,20 @@ CREATE TABLE sigungu (
   PRIMARY KEY (area_code, sigungu_code)
 ) ENGINE=InnoDB;
 
+-- 컨텐츠 타입
+CREATE TABLE content_types (
+	content_type_id INT NOT NULL,
+    content_name VARCHAR(20) NOT NULL,
+    PRIMARY KEY (content_type_id)
+) ENGINE=InnoDB;
+
+-- 카테고리 분류
+CREATE TABLE categories (
+	category VARCHAR(20) NOT NULL,
+    category_name VARCHAR(20) NOT NULL,
+    PRIMARY KEY (category)
+) ENGINE=InnoDB;
+
 -- 관광지 정보
 CREATE TABLE attraction (
   place_id INT NOT NULL AUTO_INCREMENT,
