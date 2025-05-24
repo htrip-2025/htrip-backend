@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContentTypeDto {
-    private Integer contentTypeId;
-    private String contentName;
+public class AttractionCategoryDto {
+    private String category;
+    private String categoryName;
 }

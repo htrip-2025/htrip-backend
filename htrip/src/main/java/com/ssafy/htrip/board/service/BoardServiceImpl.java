@@ -6,7 +6,7 @@ import com.ssafy.htrip.board.dto.BoardResponseDto;
 import com.ssafy.htrip.board.entity.Board;
 import com.ssafy.htrip.board.entity.Category;
 import com.ssafy.htrip.board.repository.BoardRepository;
-import com.ssafy.htrip.board.repository.CategoryRepository;
+import com.ssafy.htrip.board.repository.BoardCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final CategoryRepository categoryRepository;
+    private final BoardCategoryRepository boardCategoryRepository;
 
     @Override
     @Transactional
     public BoardResponseDto create(BoardRequestDto dto) {
-        Category category = categoryRepository.findById(dto.getCategoryNo())
+        Category category = boardCategoryRepository.findById(dto.getCategoryNo())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid category"));
         Board board = Board.builder()
                 .category(category)
@@ -55,7 +55,7 @@ public class BoardServiceImpl implements BoardService {
     public BoardResponseDto update(Long boardId, BoardRequestDto dto) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found"));
-        Category category = categoryRepository.findById(dto.getCategoryNo())
+        Category category = boardCategoryRepository.findById(dto.getCategoryNo())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid category"));
         board.setCategory(category);
         board.setContent(dto.getContent());

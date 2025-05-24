@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryStructureDto {
+public class AttractionCategoryStructureDto {
     private String category;          // 카테고리 코드 (A01)
     private String categoryName;      // 카테고리 이름 (자연)
     private List<MiddleCategoryDto> children;  // 중분류 목록

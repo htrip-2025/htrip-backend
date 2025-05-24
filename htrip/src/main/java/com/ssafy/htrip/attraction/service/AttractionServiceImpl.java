@@ -7,7 +7,7 @@ import com.ssafy.htrip.attraction.entity.Attraction;
 import com.ssafy.htrip.attraction.entity.SigunguId;
 import com.ssafy.htrip.attraction.repository.AreaRepository;
 import com.ssafy.htrip.attraction.repository.AttractionRepository;
-import com.ssafy.htrip.attraction.repository.ContentTypeRepository;
+import com.ssafy.htrip.attraction.repository.AttractionContentTypeRepository;
 import com.ssafy.htrip.attraction.repository.SigunguRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,8 @@ public class AttractionServiceImpl implements AttractionService {
     private final AttractionRepository attractionRepository;
     private final AreaRepository areaRepository;
     private final SigunguRepository sigunguRepository;
-    private final CategoryService categoryService; // 추가: 카테고리 서비스
-    private final ContentTypeRepository contentTypeRepository; // 추가: 컨텐츠 타입 레포지토리
+    private final AttractionCategoryService attractionCategoryService; // 추가: 카테고리 서비스
+    private final AttractionContentTypeRepository attractionContentTypeRepository; // 추가: 컨텐츠 타입 레포지토리
 
     @Override
     public AttractionDto findById(Integer placeId) throws NotFoundException {
@@ -162,7 +162,7 @@ public class AttractionServiceImpl implements AttractionService {
         if (a.getContentTypeId() != null && !a.getContentTypeId().isEmpty()) {
             try {
                 Integer contentTypeIdInt = Integer.parseInt(a.getContentTypeId());
-                contentTypeRepository.findById(contentTypeIdInt).ifPresent(
+                attractionContentTypeRepository.findById(contentTypeIdInt).ifPresent(
                         contentType -> builder.contentTypeName(contentType.getContentName())
                 );
             } catch (NumberFormatException e) {
@@ -171,7 +171,7 @@ public class AttractionServiceImpl implements AttractionService {
         }
 
         // 카테고리 정보 조회 및 추가
-        builder.categories(categoryService.getAttractionCategories(a.getCategory3()));
+        builder.categories(attractionCategoryService.getAttractionCategories(a.getCategory3()));
 
         return builder.build();
     }

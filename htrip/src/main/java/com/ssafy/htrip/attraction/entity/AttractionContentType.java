@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContentType {
+public class AttractionContentType {
     @Id
     private Integer contentTypeId;
     private String contentName;
