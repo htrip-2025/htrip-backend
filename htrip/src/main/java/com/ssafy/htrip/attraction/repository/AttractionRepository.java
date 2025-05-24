@@ -37,4 +37,23 @@ public interface AttractionRepository extends JpaRepository<Attraction, Integer>
 
     // 전체 검색 (키워드만)
     Page<Attraction> findByTitleContainingIgnoreCase(String keyword, Pageable pageable);
+
+    // 고급 필터링
+    @Query("SELECT a FROM Attraction a WHERE " +
+            "(:keyword IS NULL OR a.title LIKE %:keyword%) AND " +
+            "(:areaCode IS NULL OR a.areaCode = :areaCode) AND " +
+            "(:sigunguCode IS NULL OR a.sigunguCode = :sigunguCode) AND " +
+            "(:contentTypeId IS NULL OR a.contentTypeId = :contentTypeId) AND " +
+            "(:category1 IS NULL OR a.category1 = :category1) AND " +
+            "(:category2 IS NULL OR a.category2 = :category2) AND " +
+            "(:category3 IS NULL OR a.category3 = :category3)")
+    Page<Attraction> findWithFilters(
+            @Param("keyword") String keyword,
+            @Param("areaCode") Integer areaCode,
+            @Param("sigunguCode") Integer sigunguCode,
+            @Param("contentTypeId") String contentTypeId,
+            @Param("category1") String category1,
+            @Param("category2") String category2,
+            @Param("category3") String category3,
+            Pageable pageable);
 }

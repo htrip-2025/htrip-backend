@@ -6,6 +6,7 @@ import com.ssafy.htrip.attraction.service.AttractionService;
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.favorite.dto.CreateFavoriteRequest;
 import com.ssafy.htrip.favorite.service.FavoriteService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,16 +42,25 @@ public class TravelController {
         return ResponseEntity.ok(dto);
     }
 
+    @Operation(summary = "여행지 검색", description = "키워드, 지역, 카테고리 등 다양한 조건으로 여행지를 검색합니다")
     @GetMapping("/search")
     public ResponseEntity<Page<AttractionDto>> searchAttractions(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer areaCode,
             @RequestParam(required = false) Integer sigunguCode,
+            @RequestParam(required = false) String contentTypeId,
+            @RequestParam(required = false) String categoryCode,  // 선택된 카테고리 코드
             @PageableDefault(size = 20, sort = "placeId") Pageable pageable) {
 
-        AttractionSearchRequest request = new AttractionSearchRequest(keyword, areaCode, sigunguCode);
-        Page<AttractionDto> result = attractionService.searchAttractions(request, pageable);
+        AttractionSearchRequest request = AttractionSearchRequest.builder()
+                .keyword(keyword)
+                .areaCode(areaCode)
+                .sigunguCode(sigunguCode)
+                .contentTypeId(contentTypeId)
+                .categoryCode(categoryCode)
+                .build();
 
+        Page<AttractionDto> result = attractionService.searchAttractions(request, pageable);
         return ResponseEntity.ok(result);
     }
 
