@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-// src/main/java/com/example/demo/service/impl/BoardServiceImpl.java
-
->>>>>>> b91d2f61a7f91c603c912ff703ad6f861df0d2f5
 package com.ssafy.htrip.board.service;
 
 import com.ssafy.htrip.board.dto.BoardRequestDto;
@@ -229,8 +224,4 @@ public class BoardServiceImpl implements BoardService {
         Page<Board> boards = boardRepository.findByBoardIdIn(boardIds, pageable);
         return boards.map(board -> mapToDto(board));
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> b91d2f61a7f91c603c912ff703ad6f861df0d2f5
