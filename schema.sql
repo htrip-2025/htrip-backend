@@ -48,6 +48,9 @@ CREATE TABLE board_category (
   PRIMARY KEY (category_no)
 ) ENGINE=InnoDB;
 
+insert into board_category (category_name)
+values('공지사항'),('자유게시판'),('여행 팁'),('질문/답변'),('동행 구하기');
+
 -- 게시판 글
 CREATE TABLE board (
   board_no BIGINT NOT NULL AUTO_INCREMENT,
@@ -108,7 +111,7 @@ CREATE TABLE comment_likes (
   comment_id BIGINT NOT NULL,
   user_id INT NULL,                           -- NULL 허용으로 변경
   liked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
+  PRIMARY KEY (likes_id),
   UNIQUE KEY unique_comment_user (comment_id, user_id),  -- NULL 값에 주의
   CONSTRAINT fk_cl_comment FOREIGN KEY (comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE,
   CONSTRAINT fk_cl_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
