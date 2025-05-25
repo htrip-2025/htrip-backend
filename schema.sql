@@ -59,6 +59,8 @@ CREATE TABLE board (
   update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   views INT NOT NULL DEFAULT 0,
   likes INT NOT NULL DEFAULT 0,
+  comment_count INT NOT NULL DEFAULT 0,
+  has_image BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (board_no),
   INDEX idx_board_category (category_no),
   INDEX idx_board_user (user_id),
@@ -97,6 +99,18 @@ CREATE TABLE board_likes (
   CONSTRAINT fk_bl_board 
     FOREIGN KEY (board_no) REFERENCES board(board_no) 
     ON DELETE CASCADE                        -- 게시글 삭제 시 좋아요도 삭제
+) ENGINE=InnoDB;
+
+-- 댓글 추천 이력
+CREATE TABLE comment_likes (
+  likes_id INT NOT NULL AUTO_INCREMENT,
+  comment_id BIGINT NOT NULL,
+  user_id INT NULL,                           -- NULL 허용으로 변경
+  liked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY unique_comment_user (comment_id, user_id),  -- NULL 값에 주의
+  CONSTRAINT fk_cl_comment FOREIGN KEY (comment_id) REFERENCES comment(comment_id) ON DELETE CASCADE,
+  CONSTRAINT fk_cl_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- 지역 코드
