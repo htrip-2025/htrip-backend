@@ -78,6 +78,7 @@ CREATE TABLE comment (
   comment TEXT NOT NULL,
   write_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  likes INT NOT NULL DEFAULT 0,
   PRIMARY KEY (comment_id),
   INDEX idx_comment_board (board_no),
   INDEX idx_comment_user (user_id),
