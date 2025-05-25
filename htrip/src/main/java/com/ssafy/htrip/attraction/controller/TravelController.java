@@ -80,10 +80,8 @@ public class TravelController {
             // request가 null인 경우 기본 요청 생성
             if (request == null) {
                 request = new CreateFavoriteRequest();
-            } else {
-                request.setPlaceId(placeId);
             }
-
+            request.setPlaceId(placeId);
             favoriteService.addFavorite(user.getUserId(), request);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("message", "찜 목록에 추가되었습니다."));

@@ -1,11 +1,10 @@
 package com.ssafy.htrip.board.service;
 
-import com.ssafy.htrip.board.dto.BoardListWithNoticeDto;
-import com.ssafy.htrip.board.dto.BoardRequestDto;
-import com.ssafy.htrip.board.dto.BoardResponseDto;
-import com.ssafy.htrip.board.dto.BoardSortType;
+import com.ssafy.htrip.board.dto.*;
 import com.ssafy.htrip.board.entity.Board;
 import com.ssafy.htrip.board.entity.BoardCategory;
+import com.ssafy.htrip.board.entity.BoardImage;
+import com.ssafy.htrip.board.repository.BoardImageRepository;
 import com.ssafy.htrip.board.repository.BoardRepository;
 import com.ssafy.htrip.board.repository.BoardCategoryRepository;
 import com.ssafy.htrip.boardlike.entity.BoardLike;
@@ -13,6 +12,7 @@ import com.ssafy.htrip.boardlike.repository.BoardLikeRepository;
 import com.ssafy.htrip.common.entity.Role;
 import com.ssafy.htrip.common.entity.User;
 import com.ssafy.htrip.common.repository.UserRepository;
+import com.ssafy.htrip.common.service.FileUploadService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +39,8 @@ public class BoardServiceImpl implements BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final BoardCategoryRepository boardCategoryRepository;
     private final UserRepository userRepository;
+    private final BoardImageRepository boardImageRepository;
+    private final FileUploadService fileUploadService;
 
     private void checkNoticePermission(User user) {
         if (user == null || !Role.ADMIN.equals(user.getRole())) {
@@ -45,7 +50,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional
-    public BoardResponseDto createBoard(Integer userId, BoardRequestDto dto) {
+    public BoardResponseDto createBoard(Integer userId, BoardRequestDto dto, List<MultipartFile> files) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -65,6 +70,10 @@ public class BoardServiceImpl implements BoardService {
                 .build();
 
         Board savedBoard = boardRepository.save(board);
+        if (files != null && !files.isEmpty()) {
+            addImagesToBoard(savedBoard.getBoardNo(), files);
+            savedBoard.setHasImage(true);
+        }
 
         return mapToDto(savedBoard);
     }
@@ -179,7 +188,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional
-    public BoardResponseDto updateBoard(Integer userId, Long boardNo, BoardRequestDto dto) {
+    public BoardResponseDto updateBoard(Integer userId, Long boardNo, BoardRequestDto dto, List<MultipartFile> files) {
         Board board = boardRepository.findById(boardNo)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
@@ -255,11 +264,109 @@ public class BoardServiceImpl implements BoardService {
         }
     }
 
+    // 이미지 추가 메소드 구현
+    @Override
+    @Transactional
+    public List<BoardImageDto> addImagesToBoard(Long boardNo, List<MultipartFile> files) {
+        Board board = boardRepository.findById(boardNo)
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
+
+        List<BoardImage> savedImages = new ArrayList<>();
+        int orderNum = 1;
+
+        // 기존 이미지 개수 확인하여 순서 번호 조정
+        Long existingImagesCount = boardImageRepository.countByBoardBoardNo(boardNo);
+        if (existingImagesCount > 0) {
+            orderNum += existingImagesCount.intValue();
+        }
+
+        for (MultipartFile file : files) {
+            try {
+                // 파일 업로드
+                String imagePath = fileUploadService.uploadFile(file, "board");
+
+                // 이미지 엔티티 생성 및 저장
+                BoardImage image = BoardImage.builder()
+                        .board(board)
+                        .imagePath(imagePath)
+                        .originalFileName(file.getOriginalFilename())
+                        .storedFileName(imagePath.substring(imagePath.lastIndexOf("/") + 1))
+                        .fileSize(file.getSize())
+                        .orderNum(orderNum++)
+                        .build();
+
+                savedImages.add(boardImageRepository.save(image));
+            } catch (IOException e) {
+                throw new RuntimeException("파일 업로드 실패", e);
+            }
+        }
+
+        // board의 hasImage 필드 업데이트
+        if (!savedImages.isEmpty() || existingImagesCount > 0) {
+            board.setHasImage(true);
+            boardRepository.save(board);
+        }
+
+        return savedImages.stream()
+                .map(this::toImageDto)
+                .collect(Collectors.toList());
+    }
+
+    // 이미지 조회 메소드 구현
+    @Override
+    public List<BoardImageDto> getBoardImages(Long boardNo) {
+        List<BoardImage> images = boardImageRepository.findByBoardBoardNoOrderByOrderNumAsc(boardNo);
+        return images.stream()
+                .map(this::toImageDto)
+                .collect(Collectors.toList());
+    }
+
+    // 이미지 삭제 메소드 구현
+    @Override
+    @Transactional
+    public void deleteImage(Long imageId) {
+        BoardImage image = boardImageRepository.findById(imageId)
+                .orElseThrow(() -> new EntityNotFoundException("이미지를 찾을 수 없습니다."));
+
+        // 파일 삭제
+        fileUploadService.deleteFile(image.getImagePath());
+
+        // DB에서 이미지 정보 삭제
+        boardImageRepository.delete(image);
+
+        // 게시글의 모든 이미지가 삭제되었는지 확인
+        Long remainingImages = boardImageRepository.countByBoardBoardNo(image.getBoard().getBoardNo());
+        if (remainingImages == 0) {
+            Board board = image.getBoard();
+            board.setHasImage(false);
+            boardRepository.save(board);
+        }
+    }
+
+    // BoardImage -> BoardImageDto 변환 메소드
+    private BoardImageDto toImageDto(BoardImage image) {
+        return BoardImageDto.builder()
+                .imageId(image.getImageId())
+                .imagePath(image.getImagePath())
+                .originalFileName(image.getOriginalFileName())
+                .storedFileName(image.getStoredFileName())
+                .fileSize(image.getFileSize())
+                .orderNum(image.getOrderNum())
+                .build();
+    }
+
     // Entity -> DTO 변환 메서드 (현재 로그인한 사용자의 좋아요 상태 반영)
     private BoardResponseDto mapToDto(Board board) {
         boolean isLiked = false;
         if (board.getUser().getUserId() != null) {
             isLiked = boardLikeRepository.findByBoardBoardNoAndUserUserId(board.getBoardNo(), board.getUser().getUserId()).isPresent();
+        }
+        List<BoardImageDto> images = null;
+        if (board.getHasImage()) {
+            images = boardImageRepository.findByBoardBoardNoOrderByOrderNumAsc(board.getBoardNo())
+                    .stream()
+                    .map(this::toImageDto)
+                    .collect(Collectors.toList());
         }
 
         return BoardResponseDto.builder()
@@ -277,6 +384,7 @@ public class BoardServiceImpl implements BoardService {
                 .likes(board.getLikes())
                 .commentCount(board.getCommentCount())
                 .hasImage(board.getHasImage())
+                .images(images)
 //                .isLiked(isLiked)  // 현재 사용자의 좋아요 상태 추가
                 .build();
     }

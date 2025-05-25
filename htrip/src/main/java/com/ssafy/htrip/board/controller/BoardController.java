@@ -1,10 +1,7 @@
 package com.ssafy.htrip.board.controller;
 
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
-import com.ssafy.htrip.board.dto.BoardListWithNoticeDto;
-import com.ssafy.htrip.board.dto.BoardRequestDto;
-import com.ssafy.htrip.board.dto.BoardResponseDto;
-import com.ssafy.htrip.board.dto.BoardSortType;
+import com.ssafy.htrip.board.dto.*;
 import com.ssafy.htrip.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,9 +12,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/board")
@@ -28,16 +29,17 @@ public class BoardController {
     private final BoardService boardService;
 
     @Operation(summary = "게시글 작성", description = "새로운 게시글을 작성합니다.")
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BoardResponseDto> createBoard(
             @AuthenticationPrincipal CustomOAuth2User user,
-            @Valid @RequestBody BoardRequestDto dto) {
+            @RequestPart("board") @Valid BoardRequestDto dto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) throws Exception {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        BoardResponseDto response = boardService.createBoard(user.getUserId(), dto);
+        BoardResponseDto response = boardService.createBoard(user.getUserId(), dto, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -136,17 +138,18 @@ public class BoardController {
     }
 
     @Operation(summary = "게시글 수정", description = "게시글을 수정합니다.")
-    @PutMapping("/{boardNo}")
+    @PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BoardResponseDto> updateBoard(
             @AuthenticationPrincipal CustomOAuth2User user,
             @PathVariable Long boardNo,
-            @Valid @RequestBody BoardRequestDto dto) {
+            @RequestPart("board") @Valid BoardRequestDto dto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        BoardResponseDto response = boardService.updateBoard(user.getUserId(), boardNo, dto);
+        BoardResponseDto response = boardService.updateBoard(user.getUserId(), boardNo, dto, files);
         return ResponseEntity.ok(response);
     }
 
@@ -197,5 +200,51 @@ public class BoardController {
 
         Page<BoardResponseDto> response = boardService.getLikedBoards(user.getUserId(), pageable);
         return ResponseEntity.ok(response);
+    }
+
+    // 이미지 업로드 전용 엔드포인트
+    @Operation(summary = "게시글에 이미지 추가", description = "기존 게시글에 이미지를 추가합니다.")
+    @PostMapping("/{boardNo}/images")
+    public ResponseEntity<List<BoardImageDto>> uploadImages(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @PathVariable Long boardNo,
+            @RequestParam("files") List<MultipartFile> files) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 게시글 작성자 검증
+        BoardResponseDto board = boardService.getBoardDetail(boardNo);
+        if (!board.getUserId().equals(user.getUserId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<BoardImageDto> uploadedImages = boardService.addImagesToBoard(boardNo, files);
+        return ResponseEntity.ok(uploadedImages);
+    }
+
+    // 이미지 삭제 엔드포인트
+    @Operation(summary = "게시글 이미지 삭제", description = "게시글의 특정 이미지를 삭제합니다.")
+    @DeleteMapping("/images/{imageId}")
+    public ResponseEntity<Void> deleteImage(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @PathVariable Long imageId) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 이미지 삭제 (서비스에서 권한 검증)
+        boardService.deleteImage(imageId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 게시글 이미지 목록 조회
+    @Operation(summary = "게시글 이미지 목록 조회", description = "게시글의 모든 이미지를 조회합니다.")
+    @GetMapping("/{boardNo}/images")
+    public ResponseEntity<List<BoardImageDto>> getBoardImages(@PathVariable Long boardNo) {
+        List<BoardImageDto> images = boardService.getBoardImages(boardNo);
+        return ResponseEntity.ok(images);
     }
 }

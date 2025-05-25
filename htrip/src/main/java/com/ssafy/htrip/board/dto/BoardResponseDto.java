@@ -24,7 +24,7 @@ public class BoardResponseDto {
     private Boolean isNotice;
 
     // 이미지 관련 필드 (필요시)
-    private List<String> imageUrls;
+    private List<BoardImageDto> images;
 
     // 태그 관련 필드 (필요시)
     private List<String> tags;

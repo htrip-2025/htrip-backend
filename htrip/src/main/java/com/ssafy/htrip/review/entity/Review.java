@@ -5,6 +5,8 @@ import com.ssafy.htrip.common.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -31,11 +33,11 @@ public class Review {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "create_date", updatable = false, nullable = false)
     private LocalDateTime createDate;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 }

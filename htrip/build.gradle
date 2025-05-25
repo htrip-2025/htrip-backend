@@ -51,7 +51,7 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// SpringDoc OpenAPI UI
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
 	// JWT (JJWT)
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
