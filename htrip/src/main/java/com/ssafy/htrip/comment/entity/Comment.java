@@ -4,6 +4,8 @@ import com.ssafy.htrip.board.entity.Board;
 import com.ssafy.htrip.common.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -27,24 +29,22 @@ public class Comment {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @CreationTimestamp
     @Column(name = "write_date", nullable = false, updatable = false)
     private LocalDateTime writeDate;
 
+    @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer likes = 0;
 
     @PrePersist
     public void prePersist() {
         writeDate = LocalDateTime.now();
         updateDate = writeDate;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        updateDate = LocalDateTime.now();
     }
 
     // 좋아요 증가/감소 메서드

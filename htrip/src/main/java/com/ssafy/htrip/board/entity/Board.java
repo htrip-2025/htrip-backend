@@ -4,6 +4,8 @@ import com.ssafy.htrip.comment.entity.Comment;
 import com.ssafy.htrip.common.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,35 +27,39 @@ public class Board {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_no", nullable = false)
-    private Category category;
+    private BoardCategory boardCategory;
 
+    @CreationTimestamp
     @Column(name = "write_date", nullable = false, updatable = false)
     private LocalDateTime writeDate;
 
+    @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer views = 0;
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer likes = 0;
 
     @Column(name = "comment_count", nullable = false)
+    @Builder.Default
     private Integer commentCount = 0;
 
     @Column(name = "has_image", nullable = false)
+    @Builder.Default
     private Boolean hasImage = false;
 
-    @Column(name = "is_notice", nullable = false)
-    private Boolean isNotice = false;
-
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     @PrePersist

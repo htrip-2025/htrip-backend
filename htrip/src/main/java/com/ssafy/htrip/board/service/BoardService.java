@@ -1,11 +1,11 @@
 package com.ssafy.htrip.board.service;
 
+import com.ssafy.htrip.board.dto.BoardListWithNoticeDto;
 import com.ssafy.htrip.board.dto.BoardRequestDto;
 import com.ssafy.htrip.board.dto.BoardResponseDto;
+import com.ssafy.htrip.board.dto.BoardSortType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface BoardService {
     // 게시글 생성
@@ -15,13 +15,10 @@ public interface BoardService {
     BoardResponseDto getBoardDetail(Long boardNo);
 
     // 게시글 목록 조회 (페이징)
-    Page<BoardResponseDto> getBoards(Pageable pageable);
-
-    // 공지사항 목록 조회
-    List<BoardResponseDto> getNotices();
+    BoardListWithNoticeDto getBoards(BoardSortType sortType, Pageable pageable);
 
     // 카테고리별 게시글 목록 조회
-    Page<BoardResponseDto> getBoardsByCategory(Integer categoryNo, Pageable pageable);
+    BoardListWithNoticeDto getBoardsByCategory(BoardSortType sortType, Integer categoryNo, Pageable pageable);
 
     // 검색 기능
     Page<BoardResponseDto> searchBoards(String type, String keyword, Pageable pageable);

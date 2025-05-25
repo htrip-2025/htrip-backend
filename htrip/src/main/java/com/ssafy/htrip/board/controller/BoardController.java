@@ -1,8 +1,10 @@
 package com.ssafy.htrip.board.controller;
 
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
+import com.ssafy.htrip.board.dto.BoardListWithNoticeDto;
 import com.ssafy.htrip.board.dto.BoardRequestDto;
 import com.ssafy.htrip.board.dto.BoardResponseDto;
+import com.ssafy.htrip.board.dto.BoardSortType;
 import com.ssafy.htrip.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/board")
@@ -51,40 +51,48 @@ public class BoardController {
     @Operation(summary = "게시글 목록 조회", description = "게시글 목록을 페이징하여 조회합니다.")
     @GetMapping
     public ResponseEntity<Page<BoardResponseDto>> getBoards(
+            @RequestParam(defaultValue = "LATEST") String sort,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "writeDate") String sort,
-            @RequestParam(defaultValue = "desc") String direction) {
+            @RequestParam(defaultValue = "10") int size) {
+        // 정렬 기준 변환 (문자열 → 열거형)
+        BoardSortType sortType;
+        try {
+            sortType = BoardSortType.valueOf(sort.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // 유효하지 않은 정렬 기준은 기본값(최신순)으로 설정
+            sortType = BoardSortType.LATEST;
+        }
 
-        Sort.Direction sortDirection = "desc".equalsIgnoreCase(direction)
-                ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        // 페이징 정보
+        Pageable pageable = PageRequest.of(page, size);
 
-        Page<BoardResponseDto> response = boardService.getBoards(pageable);
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "공지사항 목록 조회", description = "공지사항 목록을 조회합니다.")
-    @GetMapping("/notice")
-    public ResponseEntity<List<BoardResponseDto>> getNotices() {
-        List<BoardResponseDto> response = boardService.getNotices();
-        return ResponseEntity.ok(response);
+        // 서비스 호출
+        BoardListWithNoticeDto response = boardService.getBoards(sortType, pageable);
+        return ResponseEntity.ok(response.getBoards());
     }
 
     @Operation(summary = "카테고리별 게시글 목록 조회", description = "카테고리별 게시글 목록을 페이징하여 조회합니다.")
     @GetMapping("/category/{categoryNo}")
-    public ResponseEntity<Page<BoardResponseDto>> getBoardsByCategory(
+    public ResponseEntity<BoardListWithNoticeDto> getBoardsByCategory(
             @PathVariable Integer categoryNo,
+            @RequestParam(defaultValue = "LATEST") String sort,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "writeDate") String sort,
-            @RequestParam(defaultValue = "desc") String direction) {
+            @RequestParam(defaultValue = "10") int size) {
 
-        Sort.Direction sortDirection = "desc".equalsIgnoreCase(direction)
-                ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        // 정렬 기준 변환 (문자열 → 열거형)
+        BoardSortType sortType;
+        try {
+            sortType = BoardSortType.valueOf(sort.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // 유효하지 않은 정렬 기준은 기본값(최신순)으로 설정
+            sortType = BoardSortType.LATEST;
+        }
 
-        Page<BoardResponseDto> response = boardService.getBoardsByCategory(categoryNo, pageable);
+        // 페이징 정보
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 서비스 호출
+        BoardListWithNoticeDto response = boardService.getBoardsByCategory(sortType, categoryNo, pageable);
         return ResponseEntity.ok(response);
     }
 

@@ -17,8 +17,6 @@ public class BoardRequestDto {
     @NotNull(message = "카테고리는 필수 선택값입니다.")
     private Integer categoryNo;
 
-    private Boolean isNotice;
-
     // 이미지 관련 필드 (필요시)
     private List<String> imageUrls;
 
