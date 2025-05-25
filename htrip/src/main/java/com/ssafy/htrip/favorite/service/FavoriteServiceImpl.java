@@ -158,7 +158,7 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .firstImageUrl(attraction.getFirstImageUrl())
                 .firstImageThumbnailUrl(attraction.getFirstImageThumbnailUrl())
                 .areaCode(attraction.getAreaCode())
-                .sigunguCode(attraction.getSigungu().getSigunguCode())
+                .sigunguCode(attraction.getSigunguCode())
                 .build();
     }
 }
