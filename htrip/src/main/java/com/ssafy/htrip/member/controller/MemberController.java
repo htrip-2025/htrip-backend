@@ -1,6 +1,8 @@
 package com.ssafy.htrip.member.controller;
 
 import com.ssafy.htrip.auth.dto.CustomOAuth2User;
+import com.ssafy.htrip.board.service.BoardService;
+import com.ssafy.htrip.comment.service.CommentService;
 import com.ssafy.htrip.favorite.dto.FavoriteDto;
 import com.ssafy.htrip.favorite.dto.UpdateFavoriteRequest;
 import com.ssafy.htrip.favorite.service.FavoriteService;
@@ -37,7 +39,8 @@ public class MemberController {
     private final MemberService memberService;
     private final PlanService planService;
     private final ReviewService reviewService;
-    //private final BoardService boardService;
+    private final BoardService boardService;
+    private final CommentService commentService;
 
     // === 프로필 관리 ===
 
@@ -110,13 +113,13 @@ public class MemberController {
             dashboard.put("recentReviews", reviewService.getReviewsByUserId(userId, reviewPageable));
 
 
-//        // 최근 게시글
-//        Pageable boardPageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "writeDate"));
-//        dashboard.put("recentPosts", boardService.getMyPosts(userId, boardPageable));
-//
-//        // 최근 댓글
-//        Pageable commentPageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "writeDate"));
-//        dashboard.put("recentComments", commentService.getMyComments(userId, commentPageable));
+        // 최근 게시글
+        Pageable boardPageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "writeDate"));
+        dashboard.put("recentPosts", boardService.getMyBoards(userId, boardPageable));
+
+        // 최근 댓글
+        Pageable commentPageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "writeDate"));
+        dashboard.put("recentComments", commentService.getMyComments(userId, commentPageable));
             return ResponseEntity.ok(dashboard);
         } catch (Exception e) {
             log.error("대시보드 조회 실패: ", e);

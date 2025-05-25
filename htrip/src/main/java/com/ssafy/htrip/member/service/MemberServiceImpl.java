@@ -1,5 +1,7 @@
 package com.ssafy.htrip.member.service;
 
+import com.ssafy.htrip.board.repository.BoardRepository;
+import com.ssafy.htrip.comment.repository.CommentRepository;
 import com.ssafy.htrip.common.entity.User;
 import com.ssafy.htrip.common.repository.UserRepository;
 import com.ssafy.htrip.favorite.repository.FavoriteRepository;
@@ -25,6 +27,8 @@ public class MemberServiceImpl implements MemberService {
     private final FavoriteRepository favoriteRepository;
     private final PlanRepository planRepository;
     private final ReviewRepository reviewRepository;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public MemberProfileDto getProfile(Integer userId) {
@@ -80,7 +84,8 @@ public class MemberServiceImpl implements MemberService {
         Long favoriteCount = favoriteRepository.countByUserUserId(userId);
         Long planCount = planRepository.countByUserUserId(userId);
         Long reviewCount = reviewRepository.countByUserUserId(userId);
-        // Long boardCount = boardRepository.countByUserUserId(userId);
+        Long boardCount = boardRepository.countByUserUserId(userId);
+        Long CommentCount = commentRepository.countByUserUserId(userId);
 
         // 완료된 여행 계획 수
         Long completedPlanCount = planRepository.countCompletedPlansByUserId(userId);
@@ -98,7 +103,8 @@ public class MemberServiceImpl implements MemberService {
                 .favoriteCount(favoriteCount)
                 .planCount(planCount)
                 .reviewCount(reviewCount)
-                // .boardCount(boardCount)
+                .boardCount(boardCount)
+                .CommentCount(CommentCount)
                 .completedPlanCount(completedPlanCount)
                 .joinDate(user.getRegistDate())
                 .daysSinceJoin(daysSinceJoin)
