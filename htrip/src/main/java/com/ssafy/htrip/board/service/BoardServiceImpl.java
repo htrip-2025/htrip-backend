@@ -139,7 +139,7 @@ public class BoardServiceImpl implements BoardService {
         );
 
         // 카테고리 1(공지사항)을 제외한 게시글 조회
-        regularBoards = boardRepository.findByBoardCategoryCategoryNoNot(1, sortedPageable);
+        regularBoards = boardRepository.findByBoardCategoryCategoryNo(categoryNo, sortedPageable);
 
         // 3. 결과를 DTO로 변환
         BoardListWithNoticeDto result = new BoardListWithNoticeDto();
@@ -196,7 +196,7 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
         // 본인 게시글인지 확인 (관리자는 모든 게시글 수정 가능)
-        if (!board.getUser().getUserId().equals(userId)) {
+        if (!board.getUser().getUserId().equals(userId) && !Role.ADMIN.equals(user.getRole())) {
             throw new AccessDeniedException("게시글 수정 권한이 없습니다.");
         }
 
@@ -212,9 +212,17 @@ public class BoardServiceImpl implements BoardService {
         board.setTitle(dto.getTitle());
         board.setContent(dto.getContent());
         board.setBoardCategory(boardCategory);
-        board.setHasImage(dto.getImageUrls() != null && !dto.getImageUrls().isEmpty());
 
-        return mapToDto(board);
+        // 파일이 제공된 경우 이미지 처리
+        if (files != null && !files.isEmpty()) {
+            // 이미지 추가 처리
+            addImagesToBoard(board.getBoardNo(), files);
+            board.setHasImage(true);
+        }
+
+        Board savedBoard = boardRepository.save(board);
+
+        return mapToDto(savedBoard);
     }
 
     @Override
@@ -361,13 +369,10 @@ public class BoardServiceImpl implements BoardService {
         if (board.getUser().getUserId() != null) {
             isLiked = boardLikeRepository.findByBoardBoardNoAndUserUserId(board.getBoardNo(), board.getUser().getUserId()).isPresent();
         }
-        List<BoardImageDto> images = null;
-        if (board.getHasImage()) {
-            images = boardImageRepository.findByBoardBoardNoOrderByOrderNumAsc(board.getBoardNo())
-                    .stream()
-                    .map(this::toImageDto)
-                    .collect(Collectors.toList());
-        }
+        List<BoardImageDto> images = boardImageRepository.findByBoardBoardNoOrderByOrderNumAsc(board.getBoardNo())
+                .stream()
+                .map(this::toImageDto)
+                .collect(Collectors.toList());
 
         return BoardResponseDto.builder()
                 .boardNo(board.getBoardNo())
@@ -383,7 +388,7 @@ public class BoardServiceImpl implements BoardService {
                 .views(board.getViews())
                 .likes(board.getLikes())
                 .commentCount(board.getCommentCount())
-                .hasImage(board.getHasImage())
+                .hasImage(!images.isEmpty())
                 .images(images)
 //                .isLiked(isLiked)  // 현재 사용자의 좋아요 상태 추가
                 .build();

@@ -52,7 +52,7 @@ public class BoardController {
 
     @Operation(summary = "게시글 목록 조회", description = "게시글 목록을 페이징하여 조회합니다.")
     @GetMapping
-    public ResponseEntity<Page<BoardResponseDto>> getBoards(
+    public ResponseEntity<BoardListWithNoticeDto> getBoards(
             @RequestParam(defaultValue = "LATEST") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -70,7 +70,7 @@ public class BoardController {
 
         // 서비스 호출
         BoardListWithNoticeDto response = boardService.getBoards(sortType, pageable);
-        return ResponseEntity.ok(response.getBoards());
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "카테고리별 게시글 목록 조회", description = "카테고리별 게시글 목록을 페이징하여 조회합니다.")

@@ -5,6 +5,7 @@ import com.ssafy.htrip.auth.dto.CustomOAuth2User;
 import com.ssafy.htrip.comment.dto.CommentRequestDto;
 import com.ssafy.htrip.comment.dto.CommentResponseDto;
 import com.ssafy.htrip.comment.service.CommentService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -88,6 +89,19 @@ public class CommentController {
 
         Page<CommentResponseDto> response = commentService.getMyComments(user.getUserId(), pageable);
         return ResponseEntity.ok(response);
+    }
 
+    @Operation(summary = "댓글 좋아요", description = "댓글에 좋아요를 추가/취소합니다.")
+    @PostMapping("/{commentNo}/like")
+    public ResponseEntity<Void> toggleLike(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @PathVariable Long commentNo) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        commentService.toggleLike(commentNo,user.getUserId());
+        return ResponseEntity.ok().build();
     }
 }
