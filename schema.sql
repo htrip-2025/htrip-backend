@@ -73,6 +73,20 @@ CREATE TABLE board (
   CONSTRAINT fk_board_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- 게시판 이미지
+CREATE TABLE board_images (
+  image_id BIGINT NOT NULL AUTO_INCREMENT,
+  board_no BIGINT NOT NULL,
+  image_path VARCHAR(255) NOT NULL,
+  original_file_name VARCHAR(255) NOT NULL,
+  stored_file_name VARCHAR(255) NOT NULL,
+  file_size BIGINT,
+  order_num INT,
+  PRIMARY KEY (image_id),
+  INDEX idx_image_board (board_no),
+  CONSTRAINT fk_image_board FOREIGN KEY (board_no) REFERENCES board(board_no) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- 댓글
 CREATE TABLE comment (
   comment_id BIGINT NOT NULL AUTO_INCREMENT,
