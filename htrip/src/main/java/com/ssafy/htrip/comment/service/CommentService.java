@@ -11,6 +11,9 @@ public interface CommentService {
     // 댓글 생성
     CommentResponseDto createComment(Long boardNo, Integer userId, CommentRequestDto dto);
 
+    // 댓글 조회
+    CommentResponseDto getComment(Long id);
+
     // 특정 게시글의 댓글 목록 조회
     List<CommentResponseDto> getCommentsByBoardNo(Long boardNo);
 

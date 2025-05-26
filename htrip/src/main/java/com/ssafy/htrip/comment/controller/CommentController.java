@@ -25,6 +25,11 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long id) {
+        return ResponseEntity.ok(commentService.getComment(id));
+    }
+
     // 특정 게시글의 댓글 목록 조회
     @GetMapping("/{boardId}/comments")
     public ResponseEntity<Page<CommentResponseDto>> listByBoard(

@@ -56,6 +56,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public CommentResponseDto getComment(Long id) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("댓글을 찾을 수 없습니다."));
+        return mapToDto(comment);
+    }
+
+    @Override
     public List<CommentResponseDto> getCommentsByBoardNo(Long boardNo) {
         return commentRepository.findByBoardBoardNo(boardNo).stream()
                 .map(this::mapToDto)
