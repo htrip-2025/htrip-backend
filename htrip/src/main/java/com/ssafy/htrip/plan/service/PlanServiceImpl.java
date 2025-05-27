@@ -16,8 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -164,6 +168,126 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
+    public PlanDto updateFullPlan(Integer planId, Integer userId, FullPlanUpdateRequest request) {
+        // 1. 계획 찾기
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new EntityNotFoundException("Plan not found: " + planId));
+
+        // 2. 권한 확인
+        if (!hasEditPermission(planId, userId)) {
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
+
+        // 3. 기본 정보 업데이트
+        if (request.getTitle() != null) {
+            plan.setTitle(request.getTitle());
+        }
+        plan.setPublic(request.isPublic());
+
+        // 4. 날짜 정보 업데이트
+        if (request.getStartDate() != null && request.getEndDate() != null) {
+            plan.setStartDate(request.getStartDate());
+            plan.setEndDate(request.getEndDate());
+        }
+
+        // 5. 기존 계획 일자 Map 생성 (dayDate -> PlanDay)
+        Map<Integer, PlanDay> existingDaysMap = plan.getDays().stream()
+                .collect(Collectors.toMap(PlanDay::getDayDate, day -> day));
+
+        // 6. 새 계획 일자 처리
+        if (request.getDays() != null && !request.getDays().isEmpty()) {
+            // 이전 계획 일자 참조 저장 (나중에 삭제할 항목 확인용)
+            Set<PlanDay> oldDays = new HashSet<>(plan.getDays());
+            plan.getDays().clear();
+
+            for (FullPlanUpdateRequest.PlanDayUpdateDto dayDto : request.getDays()) {
+                PlanDay day;
+
+                // 기존 일자가 있으면 재사용, 없으면 새로 생성
+                if (existingDaysMap.containsKey(dayDto.getDayDate())) {
+                    day = existingDaysMap.get(dayDto.getDayDate());
+                    day.getItems().clear(); // 기존 아이템 모두 제거
+                    oldDays.remove(day); // 삭제 목록에서 제외
+                } else {
+                    day = new PlanDay();
+                    day.setPlan(plan);
+                    day.setDayDate(dayDto.getDayDate());
+                }
+
+                // 아이템 처리
+                if (dayDto.getItems() != null) {
+                    for (int i = 0; i < dayDto.getItems().size(); i++) {
+                        FullPlanUpdateRequest.PlanItemUpdateDto itemDto = dayDto.getItems().get(i);
+
+                        PlanItem item;
+                        if (itemDto.getItemId() != null) {
+                            // 기존 아이템 찾기
+                            item = planItemRepository.findById(itemDto.getItemId())
+                                    .orElse(null);
+
+                            // 다른 계획의 아이템이면 무시
+                            if (item != null && !item.getPlanDay().getPlan().getPlanId().equals(planId)) {
+                                item = null;
+                            }
+                        } else {
+                            item = null;
+                        }
+
+                        // 아이템이 없으면 새로 생성
+                        if (item == null) {
+                            item = new PlanItem();
+
+                            // 새 장소 정보 설정
+                            if (itemDto.getPlaceId() != null) {
+                                Attraction attraction = attractionRepository.findById(itemDto.getPlaceId())
+                                        .orElseThrow(() -> new EntityNotFoundException(
+                                                "Attraction not found: " + itemDto.getPlaceId()));
+                                item.setAttraction(attraction);
+                            } else {
+                                // placeId는 필수
+                                continue;
+                            }
+                        }
+
+                        // 순서는 front에서 받은 순서대로
+                        item.setSequence(i + 1);
+
+                        // 나머지 정보 업데이트
+                        if (itemDto.getStartTime() != null && !itemDto.getStartTime().isEmpty()) {
+                            item.setStartTime(LocalTime.parse(itemDto.getStartTime()));
+                        }
+
+                        if (itemDto.getEndTime() != null && !itemDto.getEndTime().isEmpty()) {
+                            item.setEndTime(LocalTime.parse(itemDto.getEndTime()));
+                        }
+
+                        item.setMemo(itemDto.getMemo());
+                        item.setPlanDay(day);
+
+                        day.getItems().add(item);
+                    }
+                }
+
+                plan.getDays().add(day);
+            }
+
+            // 삭제된 일자의 아이템들 모두 제거 (CASCADE 설정이 있더라도 명시적으로)
+            for (PlanDay oldDay : oldDays) {
+                for (PlanItem item : oldDay.getItems()) {
+                    planItemRepository.delete(item);
+                }
+                planDayRepository.delete(oldDay);
+            }
+        }
+
+        plan.setUpdateDate(LocalDateTime.now());
+        Plan updatedPlan = planRepository.save(plan);
+
+        return toPlanDto(updatedPlan, userId);
+    }
+
+    @Override
+    @Transactional
     public PlanItemDto addPlanItem(Integer userId, CreatePlanItemRequest request) {
         PlanDay planDay = planDayRepository.findById(request.getDayId())
                 .orElseThrow(() -> new EntityNotFoundException("PlanDay not found: " + request.getDayId()));
@@ -186,6 +310,124 @@ public class PlanServiceImpl implements PlanService {
 
         PlanItem savedItem = planItemRepository.save(planItem);
         return toItemDto(savedItem);
+    }
+
+    @Override
+    @Transactional
+    public void deletePlanItem(Integer userId, Integer itemId) {
+        PlanItem planItem = planItemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("PlanItem not found: " + itemId));
+
+        Integer planId = planItem.getPlanDay().getPlan().getPlanId();
+
+        // 권한 확인
+        if (!hasEditPermission(planId, userId)) {
+            throw new IllegalArgumentException("편집 권한이 없습니다.");
+        }
+
+        planItemRepository.delete(planItem);
+    }
+
+    @Override
+    @Transactional
+    public PlanItemDto updatePlanItem(Integer userId, Integer itemId, CreatePlanItemRequest request) {
+        PlanItem planItem = planItemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("PlanItem not found: " + itemId));
+
+        Integer planId = planItem.getPlanDay().getPlan().getPlanId();
+
+        // 권한 확인
+        if (!hasEditPermission(planId, userId)) {
+            throw new IllegalArgumentException("편집 권한이 없습니다.");
+        }
+
+        // 항목이 다른 일자로 이동하는 경우
+        if (request.getDayId() != null && !request.getDayId().equals(planItem.getPlanDay().getDayId())) {
+            PlanDay newDay = planDayRepository.findById(request.getDayId())
+                    .orElseThrow(() -> new EntityNotFoundException("PlanDay not found: " + request.getDayId()));
+
+            // 같은 여행 계획 내의 일자인지 확인
+            if (!newDay.getPlan().getPlanId().equals(planId)) {
+                throw new IllegalArgumentException("다른 여행 계획의 일자로 이동할 수 없습니다.");
+            }
+
+            planItem.setPlanDay(newDay);
+        }
+
+        // 방문 장소가 변경되는 경우
+        if (request.getPlaceId() != null && !request.getPlaceId().equals(planItem.getAttraction().getPlaceId())) {
+            Attraction newAttraction = attractionRepository.findById(request.getPlaceId())
+                    .orElseThrow(() -> new EntityNotFoundException("Attraction not found: " + request.getPlaceId()));
+
+            planItem.setAttraction(newAttraction);
+        }
+
+        // 기타 정보 업데이트
+        if (request.getSequence() != null) {
+            planItem.setSequence(request.getSequence());
+        }
+
+        if (request.getStartTime() != null) {
+            planItem.setStartTime(request.getStartTime());
+        }
+
+        if (request.getEndTime() != null) {
+            planItem.setEndTime(request.getEndTime());
+        }
+
+        if (request.getMemo() != null) {
+            planItem.setMemo(request.getMemo());
+        }
+
+        PlanItem updatedItem = planItemRepository.save(planItem);
+        return toItemDto(updatedItem);
+    }
+
+    @Override
+    @Transactional
+    public List<PlanItemDto> updateItemSequence(Integer userId, Integer dayId, List<PlanItemSequenceRequest> requests) {
+        PlanDay planDay = planDayRepository.findById(dayId)
+                .orElseThrow(() -> new EntityNotFoundException("PlanDay not found: " + dayId));
+
+        Integer planId = planDay.getPlan().getPlanId();
+
+        // 권한 확인
+        if (!hasEditPermission(planId, userId)) {
+            throw new IllegalArgumentException("편집 권한이 없습니다.");
+        }
+
+        // 요청된 모든 항목이 해당 일자에 속하는지 확인
+        List<Integer> requestItemIds = requests.stream()
+                .map(PlanItemSequenceRequest::getItemId)
+                .collect(Collectors.toList());
+
+        List<PlanItem> items = planItemRepository.findAllById(requestItemIds);
+
+        // 모든 항목이 같은 일자에 속하는지 확인
+        for (PlanItem item : items) {
+            if (!item.getPlanDay().getDayId().equals(dayId)) {
+                throw new IllegalArgumentException("다른 일자의 항목 순서는 변경할 수 없습니다.");
+            }
+        }
+
+        // 순서 업데이트
+        Map<Integer, Integer> sequenceMap = requests.stream()
+                .collect(Collectors.toMap(
+                        PlanItemSequenceRequest::getItemId,
+                        PlanItemSequenceRequest::getSequence
+                ));
+
+        for (PlanItem item : items) {
+            Integer newSequence = sequenceMap.get(item.getItemId());
+            if (newSequence != null) {
+                item.setSequence(newSequence);
+            }
+        }
+
+        List<PlanItem> updatedItems = planItemRepository.saveAll(items);
+        return updatedItems.stream()
+                .map(this::toItemDto)
+                .collect(Collectors.toList());
     }
 
     // 멤버 관리 메서드들
@@ -314,7 +556,8 @@ public class PlanServiceImpl implements PlanService {
             PlanDay planDay = new PlanDay();
             planDay.setPlan(plan);
             planDay.setDayDate(i + 1);
-            plan.getDays().add(planDay);
+            PlanDay savedDay = planDayRepository.save(planDay);
+            plan.getDays().add(savedDay);
         }
     }
 

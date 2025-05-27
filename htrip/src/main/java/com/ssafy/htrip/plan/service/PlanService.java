@@ -18,6 +18,10 @@ public interface PlanService {
     PlanDto updatePlan(Integer planId, Integer userId, CreatePlanRequest request);
     PlanItemDto addPlanItem(Integer userId, CreatePlanItemRequest request);
     void deletePlan(Integer planId, Integer userId) throws IllegalAccessException;
+    PlanDto updateFullPlan(Integer planId, Integer userId, FullPlanUpdateRequest request);
+    public void deletePlanItem(Integer userId, Integer itemId);
+    public PlanItemDto updatePlanItem(Integer userId, Integer itemId, CreatePlanItemRequest request);
+    public List<PlanItemDto> updateItemSequence(Integer userId, Integer dayId, List<PlanItemSequenceRequest> requests);
 
     // 멤버 관리 메서드
     PlanMemberDto inviteMember(Integer planId, Integer inviterId, InviteMemberRequest request);

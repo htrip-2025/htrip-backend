@@ -4,8 +4,8 @@ import com.ssafy.htrip.common.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,11 +30,11 @@ public class Plan {
 
     private String title;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime updateDate;
 
     private LocalDate startDate;

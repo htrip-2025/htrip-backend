@@ -124,6 +124,30 @@ public class PlanController {
         }
     }
 
+    // 계획 전체 업데이트 (계획 정보 + 모든 아이템)
+    @PutMapping("/{planId}/full")
+    public ResponseEntity<PlanDto> updateFullPlan(
+            @PathVariable Integer planId,
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @RequestBody FullPlanUpdateRequest request) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            PlanDto updatedPlan = planService.updateFullPlan(planId, user.getUserId(), request);
+            return ResponseEntity.ok(updatedPlan);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            log.error("전체 계획 수정 실패: ", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     // 일정 삭제
     @DeleteMapping("/{planId}")
     public ResponseEntity<Void> deletePlan(
@@ -170,6 +194,77 @@ public class PlanController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             log.error("일정 아이템 추가 실패: ", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    // 일정 항목 삭제
+    @DeleteMapping("/item/{itemId}")
+    public ResponseEntity<Void> deletePlanItem(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @PathVariable Integer itemId) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            planService.deletePlanItem(user.getUserId(), itemId);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            log.error("일정 항목 삭제 실패: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 일정 항목 수정
+    @PutMapping("/item/{itemId}")
+    public ResponseEntity<PlanItemDto> updatePlanItem(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @PathVariable Integer itemId,
+            @RequestBody CreatePlanItemRequest request) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            PlanItemDto updatedItem = planService.updatePlanItem(user.getUserId(), itemId, request);
+            return ResponseEntity.ok(updatedItem);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            log.error("일정 항목 수정 실패: ", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    // 일정 항목 순서 일괄 변경
+    @PutMapping("/day/{dayId}/items/sequence")
+    public ResponseEntity<List<PlanItemDto>> updateItemSequence(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @PathVariable Integer dayId,
+            @RequestBody List<PlanItemSequenceRequest> requests) {
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            List<PlanItemDto> updatedItems = planService.updateItemSequence(user.getUserId(), dayId, requests);
+            return ResponseEntity.ok(updatedItems);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            log.error("일정 항목 순서 변경 실패: ", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
